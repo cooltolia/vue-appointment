@@ -1,0 +1,86 @@
+.custom-textarea {
+    $this: &;
+    position: relative;
+
+    &.error {
+        #{$this}__input {
+            border-color: $accent-color;
+        }
+
+        #{$this}__error {
+            opacity: 1;
+        }
+    }
+
+    &__label {
+        display: block;
+        margin-bottom: 8px;
+
+        color: rgba($color: $text-color, $alpha: 0.8);
+        font-size: 15px;
+        line-height: 1.4;
+        font-weight: 600;
+    }
+
+    &__input {
+        display: block;
+        width: 100%;
+        padding: 12px 20px;
+        height: 160px;
+
+        color: $text-color;
+        font-size: 15px;
+        line-height: 1.4;
+
+        background-color: $bg;
+        border: 1px solid #f0f0f0;
+        outline: none;
+        resize: none;
+        appearance: none;
+
+        transition: border-color 300ms ease;
+
+        &::placeholder {
+            color: $text-color-light;
+        }
+
+        &:focus {
+            border-color: $text-color;
+        }
+
+        &:read-only {
+            border-color: transparent;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+        }
+    }
+
+    &__error {
+        display: block;
+        
+        font-size: 12px;
+        color: $accent-color;
+        line-height: 1.25;
+        text-align: right;
+        text-indent: 4px;
+
+        pointer-events: none;
+        // opacity: 0;
+        // transition: opacity 300ms ease;
+    }
+}
+
+@media #{$tablet} {
+    .custom-textarea {
+    }
+}
+
+@media #{$desktop} {
+    .custom-textarea {
+        &__input {
+            line-height: 1.6;
+        }
+    }
+}

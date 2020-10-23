@@ -1,0 +1,158 @@
+
+//html
+html, body {
+  box-sizing: border-box;
+}
+html{
+  overflow-x: hidden;
+  overflow-y: auto;  
+}
+//-html
+
+
+//body
+body{
+  font-family: $ff;
+  font-size: $base-font-size;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  @media #{$md}{
+    font-size: $base-font-size - 2px;
+  }
+  @media #{$sm}{
+    font-size: $base-font-size - 3px;
+  }
+
+  @media #{$xsm}{
+    font-size: $base-font-size - 2px;
+    text-align: center;
+    img{
+      text-align: center;
+      display: inline-block;
+    }
+    .img-responsive{
+      text-align: center;
+      display: inline-block;
+      width: 100%;
+    }
+  }
+}
+//-body
+
+//.pageload
+body.pageload * {
+  @include transition( none !important);
+}
+//-.pageload
+
+
+
+//box-sizing all 
+body *{
+  box-sizing: border-box;
+}
+/* -- */
+
+//placeholder
+input[type="text"], input[type="tel"], input[type="email"], textarea {
+  @include placeholder {
+    color: #bcbcbc;
+   // font-style: italic;
+ }
+}
+//-placeholder
+
+
+/* навбар превращаеться в крестик */
+.navbar-toggle{
+  .icon-bar{
+    -webkit-transition: all 0.2s linear;
+    -moz-transition: all 0.2s linear;
+    -o-transition: all 0.2s linear;
+    transition: all 0.2s linear;
+  }
+  .icon-bar:nth-of-type(4){
+    transform-origin: 0 0;
+    @include transform(rotate(-33deg));
+
+  }
+  .icon-bar:nth-of-type(3){
+    opacity: 0;
+  }
+  .icon-bar:nth-of-type(2){
+    transform-origin: 0 0;
+    @include transform(rotate(33deg));
+  }
+}
+
+.collapsed{
+  .icon-bar{
+    @include transform(rotate(0deg)  !important);
+    opacity: 1 !important; 
+  }
+
+}
+/* -- */
+
+//row equal height on diffrent medias
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.row-eq-height-lg {
+  @media #{$lg}{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+
+.row-eq-height-md {
+  @media #{$lg}, #{$md}{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+
+.row-eq-height-sm {
+  @media #{$lg}, #{$md}, #{$sm}{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+//-row equal height on diffrent medias
+
+//no
+.no-margin{
+  margin: 0px;
+}
+
+.no-padding{
+  padding: 0px;
+}
+
+.no-scroll{
+  overflow-y: hidden;
+}
+//-no
+
+
+//my normalize
+*:focus {
+  outline: none;
+}
+
+a, a:hover, a:focus, a:visited{
+  text-decoration: none;
+  outline: none;
+}
+//-my normalize

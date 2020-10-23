@@ -1,17 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
+    <link rel="stylesheet" href="<%= BASE_URL %>/normalize.css">
+    <style>
+        @font-face {
+            font-family: 'Open Sans';
+            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Light.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Light.woff') format('woff');
+            font-weight: 300;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Open Sans';
+            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Regular.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Open Sans';
+            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-SemiBold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-SemiBold.woff') format('woff');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Open Sans';
+            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Bold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Bold.woff') format('woff');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Open Sans';
+            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-ExtraBold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-ExtraBold.woff') format('woff');
+            font-weight: 800;
+            font-style: normal;
+        }
+    </style>
+</head>
+
+<body>
     <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+        <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app"></div>
+    <div id="onlineAppointment"></div>
     <!-- built files will be auto injected -->
-  </body>
+</body>
+
 </html>

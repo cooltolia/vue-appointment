@@ -1,0 +1,43 @@
+#onlineAppointment {
+    min-width: 320px;
+
+    font-family: $font;
+    color: $text-color;
+
+    .simplebar-track {
+        &.simplebar-vertical {
+            width: 4px;
+
+            background-color: $bg;
+        }
+
+        .simplebar-scrollbar {
+            width: 2px;
+            right: 1px;
+
+            &::before {
+                opacity: 1;
+                background-color: $theme-color;
+                top: 0 !important;
+                bottom: 0 !important;
+                width: 100%;
+            }
+        }
+    }
+}
+
+body {
+    min-height: 1000px;
+}
+
+.vm--container {
+    .vm--overlay {
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .vm--modal {
+        border-radius: 0;
+        background-color: #ffffff;
+        box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.1);
+    }
+}
