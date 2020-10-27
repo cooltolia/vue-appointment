@@ -70,6 +70,8 @@
             this.$root.$on('typeUpdate', () => {
                 this.select.clearSelected();
             });
+
+            console.log(this.placeholder, this.dataLoaded);
         },
     };
 </script>

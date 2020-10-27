@@ -133,9 +133,8 @@
         },
         watch: {
             selectedDate(newValue, oldValue) {
-                debugger;
-                this.updateSelectedDate(newValue);
                 const newDate = newValue.getTime() / 1000;
+                this.updateSelectedDate({ value: newValue, id: newDate });
                 // if (oldValue) this.optionsList = [];
 
                 this.optionsList = this.$store.state.allTimeSlotsData.schedule[newDate].items;
@@ -146,6 +145,8 @@
 
             returnBack(step) {
                 this.changeCurrentStep(step);
+
+                this.$scrollTo('#onlineAppointment', 300);
             },
             calendarMounted() {
                 this.calendarReady = true;
@@ -211,6 +212,10 @@
 
             .vc-text-gray-900 {
                 color: #2c2c2c;
+            }
+
+            .vc-text-grey-400 {
+                pointer-events: none;
             }
 
             .vc-title {

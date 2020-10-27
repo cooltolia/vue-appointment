@@ -20,8 +20,9 @@
                         :placeholder="'Выберите филиал'"
                         :name="'appointment_branches'"
                         :options="{multiple: true, multipleCounterLabel: 'Выбрано филиалов', onSelect: onBranchSelect}"
-                        :dataLoaded="branches.length === 0"
+                        :dataLoaded="branches.length === 0 || !selectedSpecialization"
                     ></custom-select>
+                    <!-- {{!selectedSpecialization}} -->
                 </div>
             </div>
             <div class="actions">
@@ -64,7 +65,6 @@
             return {
                 selectedSpecialization: null,
                 selectedBranches: {},
-                validBranches: false,
 
                 // specializationValue: '',
                 // branchesValue: '',
@@ -72,7 +72,7 @@
         },
         computed: {
             formValid() {
-                return this.selectedSpecialization && this.validBranches;
+                return !!this.selectedSpecialization && !!Object.keys(this.selectedBranches).length > 0;
             },
             specializations() {
                 return this.$store.state.specializationsList;
@@ -89,26 +89,25 @@
                 'changeCurrentStep',
                 'updateSelectedDoctor',
             ]),
-            ...mapActions([
-                'loadBranchesList',
-                'submitSpecilizationBranchData'
-            ]),
+            ...mapActions(['loadBranchesList', 'submitSpecilizationBranchData']),
             onSpecializationSelect(item) {
                 this.selectedSpecialization = item;
 
                 this.loadBranchesList(item);
                 this.updateSelectedSpecialization(item);
-                this.$refs.branchesSelect.select.clearSelected()
-                this.validBranches = false
+                this.$refs.branchesSelect.select.clearSelected();
+
+                this.loadBranchesList(item).then(() => {});
             },
             onBranchSelect(selectedValue) {
                 if (selectedValue.action === 'add') {
-                    this.selectedBranches[selectedValue.id] = selectedValue;
+                    this.$set(this.selectedBranches, selectedValue.id, selectedValue);
                 } else {
-                    delete this.selectedBranches[selectedValue.id];
+                    // delete this.selectedBranches[selectedValue.id];
+                    this.$delete(this.selectedBranches, selectedValue.id);
                 }
 
-                this.validBranches = Object.keys(this.selectedBranches).length > 0;
+                console.log(this.selectedBranches);
 
                 this.updateSelectedBranches(this.selectedBranches);
             },
@@ -145,8 +144,7 @@
 
                 this.submitSpecilizationBranchData(formData).then(() => {
                     this.changeCurrentStep('timeStep');
-                })
-
+                });
             },
         },
         mounted() {
@@ -155,7 +153,6 @@
             this.updateSelectedBranch(null);
             this.updateSelectedDoctor(null);
         },
-
     };
 </script>
 

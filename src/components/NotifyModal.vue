@@ -1,6 +1,9 @@
 <template>
-    <div class="success-modal">
-        <div class="content">
+    <div class="notify-modal" style="display: none">
+        <div
+            class="content success"
+            v-if="type === 'success'"
+        >
             <img
                 :src="successImage"
                 alt=""
@@ -13,10 +16,38 @@
             <div class="title">
                 Спасибо!
             </div>
-            <p class="text">
-                Мы забронировали время специалиста для вас. В ближайшее время вам позвонит оператор контактного центра, чтобы подтвердить детали записи.
-                Если вы не сможете ответить — мы перезвоним еще два раза и если не дозвонимся, то, к сожалению, отменим запись.
-            </p>
+            <div
+                class="text"
+                v-html="$store.state.modals[type]"
+            >
+            </div>
+            <button
+                class="button"
+                type='button'
+                @click="$emit('close')"
+            >Назад</button>
+        </div>
+        <div
+            class="content"
+            v-else
+        >
+            <img
+                :src="errorImage"
+                alt=""
+                class="image"
+            >
+            <button
+                class='close'
+                @click="$emit('close')"
+            ></button>
+            <div class="title">
+                Ошибка!
+            </div>
+            <div
+                class="text"
+                v-html="$store.state.modals[type]"
+            >
+            </div>
             <button
                 class="button"
                 type='button'
@@ -28,13 +59,42 @@
 
 <script>
     const successImage = require('@/assets/images/success.svg');
+    const errorImage = require('@/assets/images/error.svg');
 
     export default {
-        name: 'SuccessModal',
+        name: 'NotifyModal',
+        props: ['type'],
         data() {
             return {
                 successImage,
+                errorImage,
             };
+        },
+        methods: {
+            open() {
+                this.$modal.show(
+                    NotifyModal,
+                    { type: 'error' },
+                    {
+                        adaptive: true,
+                        scrollable: true,
+                        width: '90%',
+                        maxWidth: 920,
+                        height: 'auto',
+                        minHeight: Infinity,
+                    },
+                    {
+                        'before-open': (event) => {
+                            document.body.style.overflow = 'hidden';
+                            document.body.style.paddingRight = vm.$store.state.scrollbarWidth + 'px';
+                        },
+                        closed: (event) => {
+                            document.body.style.overflow = null;
+                            document.body.style.paddingRight = null;
+                        },
+                    }
+                );
+            },
         },
     };
 </script>
@@ -54,7 +114,7 @@
         background-repeat: no-repeat;
     }
 
-    .success-modal {
+    .notify-modal {
         display: flex;
         justify-self: center;
         align-items: center;
@@ -67,6 +127,13 @@
 
             color: $text-color;
             text-align: center;
+
+            &.success {
+                .button {
+                    background-color: $green;
+                    border: 2px solid $green;
+                }
+            }
         }
 
         .image {
@@ -102,8 +169,8 @@
             font-weight: 600;
             text-decoration: none;
 
-            background-color: $green;
-            border: 2px solid $green;
+            background-color: $theme-color;
+            border: 2px solid $theme-color;
             box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
 
             outline: none;

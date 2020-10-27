@@ -161,6 +161,12 @@ export default class CustomSelect {
         if (this.options.multiple) {
             this.multipleSelectLogic(e, selectedValue);
         } else {
+            /** clicked item was already selected */
+            if (this.selected.textContent === selectedValue) {
+                this.closeOptionsList();
+                return;
+            }
+
             this.selected.textContent = selectedValue;
 
             if (this.valueInput) {
@@ -173,12 +179,11 @@ export default class CustomSelect {
             if (typeof this.options.onSelect === 'function') {
                 const selectedItem = {
                     value: selectedValue,
-                    id: e.target.dataset.id
-                }
+                    id: e.target.dataset.id,
+                };
                 this.options.onSelect(selectedItem);
             }
         }
-
     }
 
     setSelected(value) {
@@ -204,7 +209,7 @@ export default class CustomSelect {
 
     multipleSelectLogic(e, selectedValue) {
         const valueDivider = ';';
-        const action = e.target.classList.contains('selected') ? 'remove': 'add'
+        const action = e.target.classList.contains('selected') ? 'remove' : 'add';
         if (action === 'remove') {
             e.target.classList.remove('selected');
             this.multipleCounter--;
@@ -236,7 +241,7 @@ export default class CustomSelect {
             const selectedItem = {
                 value: selectedValue,
                 id: e.target.dataset.id,
-                action
+                action,
             };
             this.options.onSelect(selectedItem);
         }

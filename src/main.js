@@ -2,11 +2,6 @@ import Vue from 'vue';
 import App from './App.vue';
 import store from './store';
 
-import axios from 'axios';
-import VueAxios from 'vue-axios';
-
-Vue.use(VueAxios, axios);
-
 import VCalendar from 'v-calendar';
 Vue.use(VCalendar, {
     masks: { weekdays: 'WW' },
@@ -15,8 +10,11 @@ Vue.use(VCalendar, {
 import VModal from 'vue-js-modal';
 Vue.use(VModal);
 
-import VueTheMask from 'vue-the-mask';
-Vue.use(VueTheMask);
+const VueInputMask = require('vue-inputmask').default;
+Vue.use(VueInputMask);
+
+const VueScrollTo = require('vue-scrollto');
+Vue.use(VueScrollTo);
 
 import 'simplebar/dist/simplebar.css';
 

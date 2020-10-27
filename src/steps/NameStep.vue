@@ -31,7 +31,7 @@
                                 {{ doctor.name }}
                             </span>
                             <span class="profession">
-                                {{ doctor.profession }}
+                                {{ doctor.position }}
                             </span>
                         </li>
                     </ul>

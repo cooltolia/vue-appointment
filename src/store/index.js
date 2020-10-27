@@ -1,24 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import axios from 'axios';
-import VueAxios from 'vue-axios';
-
 Vue.use(Vuex);
-Vue.use(VueAxios, axios);
 
-function getaAvailableDates() {
-    const today = new Date();
-    let day1 = new Date();
-    day1 = day1.setDate(day1.getDate() + 1);
-
-    let day2 = new Date();
-    day2 = day2.setDate(day2.getDate() + 2);
-
-    let day3 = new Date();
-    day3 = day3.setDate(day3.getDate() + 4);
-
-    return [today, day1, day2, day3];
-}
+import http from '@/http';
 
 export default new Vuex.Store({
     state: {
@@ -42,6 +26,9 @@ export default new Vuex.Store({
         selectedTime: '',
 
         allTimeSlotsData: null,
+
+        privacyPolicy: '',
+        modals: {}
     },
     mutations: {
         setScrollbarWidth(state, value) {
@@ -117,83 +104,88 @@ export default new Vuex.Store({
         updatAllTimeSlotsData(state, data) {
             state.allTimeSlotsData = data;
         },
+
+        updatePrivacyPolicy(state, data) {
+            state.privacyPolicy = data;
+        },
+
+        updateModalsContent(state, {success, error, error_order}) {
+            state.modals.success = success;
+            state.modals.error = error;
+            state.modals.error_order = error_order;
+        }
     },
     actions: {
-        loadInitialData({ commit }) {
-            axios.get('http://mc21.glavnaya.com/app/ajax/order/types.php').then((response) => {
+        loadInitialData({ commit, state }) {
+            /** first check the store */
+            if (state.specializationsList.length > 0) return;
+
+            http.get('/types.php').then((response) => {
                 commit('updateSpecializationsTypes', response.data.types);
-                axios
-                    .get(
-                        'http://mc21.glavnaya.com/app/ajax/order/specializations.php?' +
-                            'type=' +
-                            response.data.types[0].id
-                    )
-                    .then((response) => {
+                http.get('/specializations.php?' + 'type=' + response.data.types[0].id).then(
+                    (response) => {
                         commit('updateSpecializationsList', response.data.specializations);
-                    });
+                    }
+                );
+            });
+
+            http.get('/info.php').then((response) => {
+                commit('updatePrivacyPolicy', response.data.privacy_policy);
+                commit('updateModalsContent', response.data);
             });
         },
 
         loadSpecializationsList({ commit }, { id }) {
             commit('updateSpecializationsList', []);
             commit('updateBranchesList', []);
-            axios
-                .get('http://mc21.glavnaya.com/app/ajax/order/specializations.php?' + 'type=' + id)
-                .then((response) => {
-                    commit('updateSpecializationsList', response.data.specializations);
-                });
+            http.get('/specializations.php?' + 'type=' + id).then((response) => {
+                commit('updateSpecializationsList', response.data.specializations);
+            });
         },
         loadBranchesList({ commit }, { id }) {
             commit('updateBranchesList', []);
-            axios
-                .get(
-                    'http://mc21.glavnaya.com/app/ajax/order/branches.php?' + 'specialization=' + id
-                )
-                .then((response) => {
+            return new Promise((resolve) => {
+                http.get('/branches.php?' + 'specialization=' + id).then((response) => {
                     commit('updateBranchesList', response.data.branches);
+                    resolve(response.data.branches);
                 });
+            });
         },
 
         loadDoctorsList({ commit, state }, name) {
             commit('updateDoctorsList', []);
             return new Promise((resolve) => {
-                axios
-                    .get(
-                        'http://mc21.glavnaya.com/app/ajax/order/doctors.php?' +
-                            'name=' +
-                            name +
-                            '&type=' +
-                            state.currentSpecializationsType.id
-                    )
-                    .then((response) => {
-                        if (!response.data.error) {
-                            commit('updateDoctorsList', response.data.doctors);
-                        }
-                        resolve(response.data);
-                    });
+                http.get(
+                    '/doctors.php?' +
+                        'name=' +
+                        name +
+                        '&type=' +
+                        state.currentSpecializationsType.id
+                ).then((response) => {
+                    if (!response.data.error) {
+                        commit('updateDoctorsList', response.data.doctors);
+                    }
+                    resolve(response.data);
+                });
             });
         },
 
         submitSelectedDoctor({ commit }, id) {
             return new Promise((resolve) => {
-                axios
-                    .get('http://mc21.glavnaya.com/app/ajax/order/schedule.php?doctor=' + id)
-                    .then((response) => {
-                        commit('updatAllTimeSlotsData', response.data);
-                        resolve(response.data);
-                    });
+                http.get('/schedule.php?doctor=' + id).then((response) => {
+                    commit('updatAllTimeSlotsData', response.data);
+                    resolve(response.data);
+                });
             });
         },
         submitSpecilizationBranchData({ commit }, formData) {
             return new Promise((resolve) => {
-                axios
-                    .get(
-                        `http://mc21.glavnaya.com/app/ajax/order/schedule.php?specialization=${formData.specialization}&branches=${formData.branches}`
-                    )
-                    .then((response) => {
-                        commit('updatAllTimeSlotsData', response.data);
-                        resolve(response.data);
-                    });
+                http.get(
+                    `/schedule.php?specialization=${formData.specialization}&branches=${formData.branches}`
+                ).then((response) => {
+                    commit('updatAllTimeSlotsData', response.data);
+                    resolve(response.data);
+                });
             });
         },
     },

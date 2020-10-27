@@ -90,6 +90,8 @@
                     const parentCard = e.target.closest('.v-doctor-card');
                     const doctorId = parentCard.dataset.doctorId;
                     const branchId = parentCard.dataset.branchId;
+
+                    debugger;
                     e.target.classList.add('selected');
                     this.updateSelectedTime(e.target.textContent.trim());
                     this.updateSelectedDoctor({name: this.doctorData.name, id: doctorId});
@@ -217,6 +219,7 @@
                 color: $text-color-dark;
 
                 border: 2px solid #f0f0f0;
+                background-color: #fff;
 
                 transition: border-color 300ms ease;
 

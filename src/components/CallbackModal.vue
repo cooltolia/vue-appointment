@@ -47,14 +47,14 @@
                     </div>
                     <div class="form-col">
                         <div class="custom-input">
-                            <the-mask
+                            <input
                                 class='custom-input__input'
-                                mask="+7 (###) ###-##-##"
-                                type="tel"
-                                :masked="false"
+                                v-mask="'+7 (999) 999-99-99'"
+                                inputmode="tel"
                                 placeholder="Телефон"
                                 v-model="phone"
-                            ></the-mask>
+                                @input="phoneValidate"
+                            />
                         </div>
                     </div>
                 </div>
@@ -81,7 +81,10 @@
                     </div>
                     <div class="form-col flex-center">
                         <div class="legal">
-                            Нажимая кнопку я соглашаюсь с <br><a href="#">Политикой конфиденциальности</a>
+                            Нажимая кнопку я соглашаюсь с <br><a
+                                target="_blank"
+                                :href="$store.state.privacyPolicy"
+                            >Политикой конфиденциальности</a>
                         </div>
                     </div>
                 </div>
@@ -103,16 +106,41 @@
                 formSended: false,
 
                 successImage,
+
+                phoneValid: false,
             };
         },
         computed: {
             formValid() {
-                return this.phone.length === 10;
+                return this.phoneValid;
             },
         },
         methods: {
             submitForm() {
+                const formData = {
+                    name: this.name,
+                    phone: this.phone,
+                    comment: this.comment,
+                };
+
+                this.$axios
+                    .get('http://mc21.glavnaya.com/app/ajax/order/call_request.php', {
+                        params: {
+                            ...formData
+                        },
+                    })
+                    .then(response => {
+                        debugger;
+                    });
+
                 this.formSended = true;
+            },
+            phoneValidate(field) {
+                if (field.target.inputmask.isComplete()) {
+                    this.phoneValid = true;
+                } else {
+                    this.phoneValid = false;
+                }
             },
         },
     };

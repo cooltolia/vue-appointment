@@ -46,14 +46,14 @@
                 <div class="form-row">
                     <div class="form-col">
                         <div class="custom-input">
-                            <the-mask
+                            <input
                                 class='custom-input__input'
-                                mask="+7 (###) ###-##-##"
-                                type="tel"
-                                :masked="false"
+                                v-mask="'+7 (999) 999-99-99'"
+                                inputmode="tel"
                                 placeholder="Телефон"
                                 v-model="phone"
-                            ></the-mask>
+                                @input="phoneValidate"
+                            />
                         </div>
                         <div class="custom-input">
                             <input
@@ -64,14 +64,14 @@
                             >
                         </div>
                         <div class='input'>
-                            <the-mask
+                            <input
                                 class='custom-input__input'
-                                mask="##.##.####"
-                                type="text"
-                                :masked="false"
+                                v-mask="'99.99.9999'"
+                                inputmode="numeric"
                                 placeholder="Дата рождения"
                                 v-model="birthday"
-                            ></the-mask>
+                                @input="birthdayValidate"
+                            />
                         </div>
                     </div>
                     <div class="form-col">
@@ -96,7 +96,10 @@
                     </div>
                     <div class="form-col flex-center">
                         <div class="legal">
-                            Нажимая кнопку «Записаться», вы соглашаетесь с <br><a href="#">Политикой обработки персональных данных.</a>
+                            Нажимая кнопку «Записаться», вы соглашаетесь с <br><a
+                                target="_blank"
+                                :href="$store.state.privacyPolicy"
+                            >Политикой обработки персональных данных.</a>
                         </div>
                     </div>
                 </div>
@@ -108,7 +111,8 @@
 
 <script>
     import { mapMutations } from 'vuex';
-    import SuccessModal from '@/components/SuccessModal';
+    import NotifyModal from '@/components/NotifyModal';
+    import http from '@/http';
 
     export default {
         name: 'FormStep',
@@ -125,51 +129,150 @@
                 phone: '',
                 name: '',
                 comment: '',
+
+                birthdayValid: false,
+                phoneValid: false,
             };
         },
         methods: {
-            ...mapMutations(['changeCurrentStep', 'changeCurrentStep']),
+            ...mapMutations(['changeCurrentStep']),
 
             returnBack(step) {
                 this.changeCurrentStep(step);
+
+                this.$scrollTo('#onlineAppointment', 300);
+            },
+            birthdayValidate(field) {
+                if (field.target.inputmask.isComplete()) {
+                    this.birthdayValid = true;
+                } else {
+                    this.birthdayValid = false;
+                }
+            },
+            phoneValidate(field) {
+                if (field.target.inputmask.isComplete()) {
+                    this.phoneValid = true;
+                } else {
+                    this.phoneValid = false;
+                }
             },
             submitForm() {
+                const vm = this;
+
                 this.changeCurrentStep('specializationStep');
 
-                const vm = this;
-                this.$modal.show(
-                    SuccessModal,
-                    {},
-                    {
-                        adaptive: true,
-                        scrollable: true,
-                        width: '90%',
-                        maxWidth: 920,
-                        height: 'auto',
-                        minHeight: Infinity
+                this.$scrollTo('#onlineAppointment', 300);
+
+                const selectedTime = this.selectedTime.split(' — ');
+
+                const formData = {
+                    birthday: this.birthday,
+                    phone: this.phone,
+                    name: this.name,
+                    comment: this.comment,
+                    doctor: this.selectedDoctor.id,
+                    branch: this.selectedBranch.id,
+                    day: this.$store.state.selectedDate.id,
+                    time_from: selectedTime[0],
+                    time_to: selectedTime[1],
+                };
+
+                http.get('/add.php', {
+                    params: {
+                        ...formData,
                     },
-                    {
-                        'before-open': (event) => {
-                            document.body.style.overflow = 'hidden';
-                            document.body.style.paddingRight = vm.$store.state.scrollbarWidth + 'px';
-                        },
-                        closed: (event) => {
-                            document.body.style.overflow = null;
-                            document.body.style.paddingRight = null;
-                        },
-                    }
-                );
+                })
+                    .then((response) => {
+                        if (response.data.success) {
+                            this.$modal.show(
+                                NotifyModal,
+                                { type: 'success' },
+                                {
+                                    adaptive: true,
+                                    scrollable: true,
+                                    width: '90%',
+                                    maxWidth: 920,
+                                    height: 'auto',
+                                    minHeight: Infinity,
+                                },
+                                {
+                                    'before-open': (event) => {
+                                        document.body.style.overflow = 'hidden';
+                                        document.body.style.paddingRight =
+                                            vm.$store.state.scrollbarWidth + 'px';
+                                    },
+                                    closed: (event) => {
+                                        document.body.style.overflow = null;
+                                        document.body.style.paddingRight = null;
+                                    },
+                                }
+                            );
+                        } else if (data.error) {
+                            this.$modal.show(
+                                NotifyModal,
+                                { type: 'error' },
+                                {
+                                    adaptive: true,
+                                    scrollable: true,
+                                    width: '90%',
+                                    maxWidth: 920,
+                                    height: 'auto',
+                                    minHeight: Infinity,
+                                },
+                                {
+                                    'before-open': (event) => {
+                                        document.body.style.overflow = 'hidden';
+                                        document.body.style.paddingRight =
+                                            vm.$store.state.scrollbarWidth + 'px';
+                                    },
+                                    closed: (event) => {
+                                        document.body.style.overflow = null;
+                                        document.body.style.paddingRight = null;
+                                    },
+                                }
+                            );
+                        } else if (data.error_order) {
+                            this.$modal.show(
+                                NotifyModal,
+                                { type: 'error_order' },
+                                {
+                                    adaptive: true,
+                                    scrollable: true,
+                                    width: '90%',
+                                    maxWidth: 920,
+                                    height: 'auto',
+                                    minHeight: Infinity,
+                                },
+                                {
+                                    'before-open': (event) => {
+                                        document.body.style.overflow = 'hidden';
+                                        document.body.style.paddingRight =
+                                            vm.$store.state.scrollbarWidth + 'px';
+                                    },
+                                    closed: (event) => {
+                                        document.body.style.overflow = null;
+                                        document.body.style.paddingRight = null;
+                                    },
+                                }
+                            );
+                        }
+                    })
+                    .catch((e) => {
+                        {
+                            console.log(e);
+                        }
+                    });
             },
         },
         computed: {
             formValid() {
-                return this.birthday.length === 8 && this.phone.length === 10;
+                return this.birthdayValid && this.phoneValid && this.name.trim().length > 3;
             },
         },
         mounted() {
             this.selectedDoctor = this.$store.state.selectedDoctor;
             this.selectedBranch = this.$store.state.selectedBranch;
-            this.selectedDate = this.$store.state.selectedDate.toLocaleString('ru', {
+            this.selectedDate = this.$store.state.selectedDate.value.toLocaleString('ru', {
                 month: 'long',
                 day: 'numeric',
                 year: 'numeric',
