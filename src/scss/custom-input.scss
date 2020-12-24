@@ -37,6 +37,9 @@
         outline: none;
         appearance: none;
 
+        overflow: hidden;
+        text-overflow: ellipsis;
+
         transition: border-color 300ms ease;
 
         &::placeholder {

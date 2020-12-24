@@ -20,7 +20,29 @@ import 'simplebar/dist/simplebar.css';
 
 Vue.config.productionTip = false;
 
-window.vm = new Vue({
+window.onlineAppointmentInstance = new Vue({
     store,
     render: (h) => h(App),
 }).$mount('#onlineAppointment');
+
+window.reinitOnlineAppointment = (vm, cb) => {
+    vm.$destroy();
+    const parent = document.querySelector('#onlineAppointment');
+    const parentClone = parent.cloneNode();
+    parent.replaceWith(parentClone);
+
+    window.doctor = null;
+    window.service = null;
+    window.specialization = null;
+
+    store.commit('resetState');
+
+    if (typeof cb === 'function') {
+        cb();
+    }
+
+    window.onlineAppointmentInstance = new Vue({
+        store,
+        render: (h) => h(App),
+    }).$mount('#onlineAppointment');
+};

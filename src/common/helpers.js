@@ -1,9 +1,9 @@
-export const debounce = function (func, wait, immediate) {
+export const debounce = function(func, wait, immediate) {
     let timeout;
-    return function () {
+    return function() {
         const context = this,
             args = arguments;
-        const later = function () {
+        const later = function() {
             timeout = null;
             if (!immediate) func.apply(context, args);
         };
@@ -14,18 +14,18 @@ export const debounce = function (func, wait, immediate) {
     };
 };
 
-export const throttle = function (func, wait, options) {
+export const throttle = function(func, wait, options) {
     var context, args, result;
     var timeout = null;
     var previous = 0;
     if (!options) options = {};
-    var later = function () {
+    var later = function() {
         previous = options.leading === false ? 0 : Date.now();
         timeout = null;
         result = func.apply(context, args);
         if (!timeout) context = args = null;
     };
-    return function () {
+    return function() {
         var now = Date.now();
         if (!previous && options.leading === false) previous = now;
         var remaining = wait - (now - previous);
@@ -46,7 +46,7 @@ export const throttle = function (func, wait, options) {
     };
 };
 
-export const measureScrollbar = function (force = false) {
+export const measureScrollbar = function(force = false) {
     // return cached value if we have some
     if (force !== true && typeof measureScrollbar.__cache === 'number') {
         console.log('returned from cache');
@@ -79,7 +79,7 @@ export const measureScrollbar = function (force = false) {
     return measureScrollbar.__cache;
 };
 
-const setCookie = function (key, value, expiry) {
+const setCookie = function(key, value, expiry) {
     const expires = new Date();
     expires.setTime(expires.getTime() + expiry * 24 * 60 * 60 * 1000);
     document.cookie = key + '=' + value + '; path=/ ;expires=' + expires.toUTCString();
@@ -162,7 +162,7 @@ function hideSingleInputError(input) {
 }
 
 export function createNewEvent(eventName, data) {
-    (function () {
+    (function() {
         if (typeof window.CustomEvent === 'function') return false;
 
         function CustomEvent(event, params) {
@@ -316,7 +316,7 @@ function chunkArray(arr, chunk_size) {
     return tempArray;
 }
 
-export const getSiblings = function (elem) {
+export const getSiblings = function(elem) {
     // Setup siblings array and get the first sibling
     var siblings = [];
     var sibling = elem.parentNode.firstChild;

@@ -22,7 +22,20 @@
                 v-if="selectedSpecialization"
             >
                 <div class="info-title">Специализация:</div>
-                <div class="info-value">{{ selectedSpecialization.value }}</div>
+                <div class="info-value">{{ selectedSpecialization.name }}</div>
+                <a
+                    class="info-link"
+                    href="#"
+                    @click.prevent="returnBack('specializationStep')"
+                >Сменить
+                </a>
+            </div>
+            <div
+                class='info-row'
+                v-if="selectedService"
+            >
+                <div class="info-title">Услуга:</div>
+                <div class="info-value">{{ selectedService.name }}</div>
                 <a
                     class="info-link"
                     href="#"
@@ -83,10 +96,11 @@
                         >
                             <DoctorCard
                                 :doctorId='card.doctor.id'
+                                :shiftId='card.doctor.id_shift'
                                 :branchId='card.branch.id'
                                 :doctorData="{avatar: card.doctor.photo, name: card.doctor.name, profession: card.doctor.position}"
                                 :address='card.branch.name'
-                                :metro='card.branch.metro'
+                                :metro='card.branch.address'
                                 :workTime='card.slots'
                             ></DoctorCard>
                         </div>
@@ -115,6 +129,7 @@
                 title: '',
                 selectedDoctor: null,
                 selectedSpecialization: null,
+                selectedService: null,
                 selectedBranches: null,
 
                 scroll: null,
@@ -141,12 +156,15 @@
             },
         },
         methods: {
-            ...mapMutations(['changeCurrentStep', 'updateSelectedDate']),
+            ...mapMutations(['changeCurrentStep', 'updateSelectedDate', 'updateSelectedDoctor']),
 
             returnBack(step) {
                 this.changeCurrentStep(step);
+                if (step === 'nameStep') {
+                    this.updateSelectedDoctor(null)
+                }
 
-                this.$scrollTo('#onlineAppointment', 300);
+                this.$scrollTo('#onlineAppointment', 300, {offset: -60});
             },
             calendarMounted() {
                 this.calendarReady = true;
@@ -160,6 +178,8 @@
 
             this.selectedDoctor = this.$store.state.selectedDoctor;
             this.selectedSpecialization = this.$store.state.selectedSpecialization;
+            this.selectedService = this.$store.state.selectedService;
+
             if (this.$store.state.selectedBranches) {
                 this.selectedBranches = Object.values(this.$store.state.selectedBranches)
                     .map((branch) => branch.value)

@@ -1,18 +1,53 @@
 <template>
-    <div>
-
+    <div class='wrapper'>
+        <transition
+            name="fade"
+            mode='out-in'
+        >
+            <div
+                class="loader"
+                v-if='loader'
+            >
+                <div class="dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div class="text">{{ loaderText }}</div>
+            </div>
+        </transition>
         <div class='specialization-step'>
             <div class="selects">
-                <div class="select">
-                    <custom-select
-                        ref="specializationSelect"
-                        :items="specializations"
-                        :placeholder="'Выберите направление'"
-                        :name="'appointment_specialization'"
-                        :options="{onSelect: onSpecializationSelect}"
-                        :dataLoaded="specializations.length === 0"
-                    ></custom-select>
-                </div>
+                <template>
+                    <div
+                        class='input custom-input'
+                        v-if="selectedService"
+                    >
+                        <input
+                            class="custom-input__input"
+                            type="text"
+                            readonly
+                            name=""
+                            :value="selectedService.name"
+                            :title="selectedService.name"
+                        >
+                    </div>
+                    <div
+                        class="select"
+                        v-else
+                    >
+                        <custom-select
+                            ref="specializationSelect"
+                            :items="specializations"
+                            :placeholder="'Выберите направление'"
+                            :name="'appointment_specialization'"
+                            :selected='selectedSpecializationName'
+                            :options="{onSelect: onSpecializationSelect}"
+                            :disabled="specializations.length === 0"
+                        ></custom-select>
+                    </div>
+                </template>
                 <div class="select">
                     <custom-select
                         ref="branchesSelect"
@@ -20,17 +55,26 @@
                         :placeholder="'Выберите филиал'"
                         :name="'appointment_branches'"
                         :options="{multiple: true, multipleCounterLabel: 'Выбрано филиалов', onSelect: onBranchSelect}"
-                        :dataLoaded="branches.length === 0 || !selectedSpecialization"
+                        :disabled="branches.length === 0 || (!selectedSpecializationName && !selectedService)"
                     ></custom-select>
-                    <!-- {{!selectedSpecialization}} -->
                 </div>
+
             </div>
             <div class="actions">
-                <a
-                    href="#"
-                    class="link bold"
-                    @click.prevent="$store.commit('changeCurrentStep', 'nameStep')"
-                >Найти врача по ФИО</a>
+                <template>
+                    <a
+                        v-if="selectedService"
+                        href="#"
+                        class="link bold"
+                        @click.prevent='resetSelectedService'
+                    >Другие услуги</a>
+                    <a
+                        v-else
+                        href="#"
+                        class="link bold"
+                        @click.prevent="gotoNameStep"
+                    >Найти врача по ФИО</a>
+                </template>
                 <a
                     href="#"
                     class="link"
@@ -39,7 +83,7 @@
                 <button
                     class='submit'
                     type="button"
-                    :disabled='!formValid'
+                    :disabled='!formValid || preventSubmit'
                     @click.prevent="submit"
                 >Найти приемы</button>
             </div>
@@ -59,26 +103,40 @@
         name: 'SpecializationStep',
         components: {
             CustomSelect,
-            // CallbackModal,
         },
         data() {
             return {
-                selectedSpecialization: null,
+                selectedSpecialization: this.$store.state.selectedSpecialization,
                 selectedBranches: {},
+                loader: false,
+                loaderTextArray: [
+                    { text: 'Ищем подходящие приемы', delay: 5000 },
+                    { text: 'Проверили почти все филиалы', delay: 7000 },
+                    { text: 'Осталась пара секунд', delay: 8000 },
+                ],
+                loaderText: '',
 
-                // specializationValue: '',
-                // branchesValue: '',
+                preventSubmit: false,
             };
         },
         computed: {
             formValid() {
-                return !!this.selectedSpecialization && !!Object.keys(this.selectedBranches).length > 0;
+                return (
+                    (!!this.selectedSpecializationName || !!this.selectedService) &&
+                    !!Object.keys(this.selectedBranches).length > 0
+                );
             },
             specializations() {
                 return this.$store.state.specializationsList;
             },
             branches() {
                 return this.$store.state.branchesList;
+            },
+            selectedService() {
+                return this.$store.state.selectedService;
+            },
+            selectedSpecializationName() {
+                return this.$store.state.selectedSpecialization?.name;
             },
         },
         methods: {
@@ -88,22 +146,26 @@
                 'updateSelectedBranch',
                 'changeCurrentStep',
                 'updateSelectedDoctor',
+                'updateSelectedService',
+                'updateInitialFormStep',
+                'resetState',
             ]),
-            ...mapActions(['loadBranchesList', 'submitSpecilizationBranchData']),
+            ...mapActions([
+                'loadBranchesList',
+                'submitSpecilizationBranchData',
+                'loadSpecializationsList',
+            ]),
             onSpecializationSelect(item) {
-                this.selectedSpecialization = item;
+                this.selectedSpecialization = { name: item.value, id: item.id };
 
-                this.loadBranchesList(item);
-                this.updateSelectedSpecialization(item);
+                this.loadBranchesList({ specialization: item });
+                this.updateSelectedSpecialization(this.selectedSpecialization);
                 this.$refs.branchesSelect.select.clearSelected();
-
-                this.loadBranchesList(item).then(() => {});
             },
             onBranchSelect(selectedValue) {
                 if (selectedValue.action === 'add') {
                     this.$set(this.selectedBranches, selectedValue.id, selectedValue);
                 } else {
-                    // delete this.selectedBranches[selectedValue.id];
                     this.$delete(this.selectedBranches, selectedValue.id);
                 }
 
@@ -113,6 +175,7 @@
             },
             triggerCallback() {
                 const vm = this;
+
                 this.$modal.show(
                     CallbackModal,
                     {},
@@ -137,26 +200,161 @@
                 );
             },
             submit() {
+                this.preventSubmit = true;
+
                 const formData = {
-                    specialization: this.selectedSpecialization.id,
+                    specialization: this.$store.state.selectedSpecialization?.id,
+                    service: this.selectedService ? this.selectedService.id : null,
                     branches: Object.keys(this.selectedBranches),
                 };
 
-                this.submitSpecilizationBranchData(formData).then(() => {
-                    this.changeCurrentStep('timeStep');
-                });
+                this.loader = true;
+                this.updateLoaderText();
+
+                this.submitSpecilizationBranchData(formData)
+                    .then(() => {
+                        this.updateInitialFormStep('specializationStep')
+                        this.changeCurrentStep('timeStep');
+                    })
+                    .finally(() => {
+                        this.stopLoaderText();
+                        this.loader = false;
+                        this.loaderText = '';
+
+                        this.preventSubmit = false
+                    });
+            },
+
+            updateLoaderText(array = null) {
+                array = array || [...this.loaderTextArray];
+                const item = array.shift();
+                console.log(item);
+
+                if (!item) {
+                    this.stopLoaderText();
+                    return;
+                }
+
+                this._setTimeout = setTimeout(() => {
+                    this.loaderText = item.text;
+                    this.updateLoaderText(array);
+                }, item.delay);
+            },
+
+            stopLoaderText() {
+                clearTimeout(this._setTimeout);
+            },
+
+            resetSelectedService() {
+                this.resetState();
+                this.$refs.branchesSelect.select.clearSelected();
+
+                window.service = null; // should have been done better
+
+                this.$store.dispatch('loadInitialData', true);
+            },
+
+            gotoNameStep() {
+                window.specialization = null;
+                this.$store.commit('changeCurrentStep', 'nameStep');
             },
         },
         mounted() {
-            this.updateSelectedSpecialization(null);
-            this.updateSelectedBranches(null);
-            this.updateSelectedBranch(null);
-            this.updateSelectedDoctor(null);
+            this.$root.$on('typeUpdate', (e) => {
+                this.selectedBranches = {};
+                this.updateSelectedBranches(null);
+                window.specialization = null;
+
+                if (!this.selectedService && this.$store.state.currentStep === 'specializationStep') {
+                    this.loadSpecializationsList(this.$store.state.currentSpecializationsType);
+                    console.log(this.$store.state.currentSpecializationsType);
+                    this.updateSelectedSpecialization(null);
+                }
+            });
+        },
+
+        destroyed() {
+            this.$root.$off('typeUpdate');
         },
     };
 </script>
 
 <style lang='scss' scoped>
+    @import '@/scss/custom-input.scss';
+
+    .wrapper {
+        position: relative;
+    }
+
+    .loader {
+        position: absolute;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        align-items: center;
+
+        background-color: rgba(#fff, 0.9);
+
+        .dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            margin-right: 10px;
+
+            background-color: #eee;
+            border-radius: 50%;
+
+            animation: loaderBounce 2s ease infinite;
+
+            &:nth-child(2) {
+                animation-delay: 0.5s;
+            }
+
+            &:nth-child(3) {
+                animation-delay: 1s;
+            }
+
+            &:nth-child(4) {
+                animation-delay: 1.5s;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+
+        .text {
+            position: absolute;
+            left: 50%;
+            bottom: 12px;
+            transform: translateX(-50%);
+
+            font-size: 16px;
+        }
+    }
+
+    @keyframes loaderBounce {
+        from,
+        to {
+            background-color: #eee;
+        }
+
+        50% {
+            background-color: $green;
+        }
+    }
+
     .specialization-step {
         max-width: 695px;
         margin: 0 auto;
@@ -167,10 +365,14 @@
             margin: 0 -8px 16px;
         }
 
-        .select {
+        .select,
+        .input {
             width: 40%;
             flex: 1 1 auto;
             margin: 0 8px;
+        }
+
+        .input input {
         }
 
         .actions {

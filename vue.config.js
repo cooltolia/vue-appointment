@@ -1,5 +1,5 @@
 module.exports = {
-    publicPath: process.env.NODE_ENV === 'production' ? './assets/appointment' : './',
+    publicPath: process.env.NODE_ENV === 'production' ? '/assets/appointment' : './',
     css: {
         loaderOptions: {
             sass: {

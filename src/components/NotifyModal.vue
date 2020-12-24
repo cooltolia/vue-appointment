@@ -1,5 +1,5 @@
 <template>
-    <div class="notify-modal" style="display: none">
+    <div class="notify-modal">
         <div
             class="content success"
             v-if="type === 'success'"
@@ -70,32 +70,32 @@
                 errorImage,
             };
         },
-        methods: {
-            open() {
-                this.$modal.show(
-                    NotifyModal,
-                    { type: 'error' },
-                    {
-                        adaptive: true,
-                        scrollable: true,
-                        width: '90%',
-                        maxWidth: 920,
-                        height: 'auto',
-                        minHeight: Infinity,
-                    },
-                    {
-                        'before-open': (event) => {
-                            document.body.style.overflow = 'hidden';
-                            document.body.style.paddingRight = vm.$store.state.scrollbarWidth + 'px';
-                        },
-                        closed: (event) => {
-                            document.body.style.overflow = null;
-                            document.body.style.paddingRight = null;
-                        },
-                    }
-                );
-            },
-        },
+        // methods: {
+        //     open() {
+        //         this.$modal.show(
+        //             NotifyModal,
+        //             { type: 'error' },
+        //             {
+        //                 adaptive: true,
+        //                 scrollable: true,
+        //                 width: '90%',
+        //                 maxWidth: 920,
+        //                 height: 'auto',
+        //                 minHeight: Infinity,
+        //             },
+        //             {
+        //                 'before-open': (event) => {
+        //                     document.body.style.overflow = 'hidden';
+        //                     document.body.style.paddingRight = vm.$store.state.scrollbarWidth + 'px';
+        //                 },
+        //                 closed: (event) => {
+        //                     document.body.style.overflow = null;
+        //                     document.body.style.paddingRight = null;
+        //                 },
+        //             }
+        //         );
+        //     },
+        // },
     };
 </script>
 

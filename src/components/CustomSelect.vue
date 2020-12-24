@@ -1,7 +1,7 @@
 <template>
     <div
         class="custom-select"
-        :class="{disabled: dataLoaded}"
+        :class="{disabled: disabled}"
     >
         <input
             class="custom-select__value"
@@ -15,7 +15,7 @@
             class="custom-select__selected"
             type="button"
             tabindex="0"
-        >{{placeholder}}
+        >{{selected ? selected : placeholder}}
         </button>
         <div
             class="custom-select__dropdown"
@@ -49,7 +49,8 @@
             items: Array,
             options: Object,
             name: String,
-            dataLoaded: Boolean,
+            disabled: Boolean,
+            selected: String,
         },
         data() {
             return {
@@ -58,7 +59,7 @@
         },
         methods: {
             handleChange(e) {
-                this.$emit('change', {value: e.target.value, id: e.target.dataset.id});
+                this.$emit('change', { value: e.target.value, id: e.target.dataset.id });
             },
             handleClear() {
                 this.select.clearSelected();
@@ -70,8 +71,6 @@
             this.$root.$on('typeUpdate', () => {
                 this.select.clearSelected();
             });
-
-            console.log(this.placeholder, this.dataLoaded);
         },
     };
 </script>

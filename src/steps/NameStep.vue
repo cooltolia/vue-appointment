@@ -3,7 +3,7 @@
         <div class="input">
             <span
                 class="input-error"
-                v-if="error"
+                v-if="empty"
             >Врачи на найдены</span>
             <input
                 type="text"
@@ -11,6 +11,7 @@
                 placeholder="Введите ФИО врача"
                 v-model="doctorName"
                 autocomplete="off"
+                :readonly="loading"
             >
             <transition name="fade">
                 <div
@@ -43,7 +44,7 @@
             <a
                 href="#"
                 class="link bold"
-                @click.prevent="$store.commit('changeCurrentStep', 'specializationStep')"
+                @click.prevent="gotoSpecialization"
             >Найти по специализации</a>
             <a
                 href="#"
@@ -53,7 +54,7 @@
             <button
                 class='submit'
                 type="button"
-                :disabled='!formValid'
+                :disabled='!formValid || preventSubmit'
                 @click.prevent="submit"
             >Найти приемы</button>
         </div>
@@ -70,22 +71,28 @@
         name: 'NameStep',
         data() {
             return {
-                doctorName: '',
-                doctorID: null,
+                doctorName: this.$store.state.selectedDoctor?.name || '',
+                doctorID: this.$store.state.selectedDoctor?.id || null,
                 doctors: [],
+
                 showList: false,
-                loadMore: true,
-                error: false,
+                loading: false,
+                preventLoading: false,
+                preventSubmit: false,
+                empty: false,
             };
         },
         watch: {
             doctorName(newValue, oldValue) {
                 this.showList = false;
-                if (this.loadMore && newValue.trim().length >= 2) {
+
+                if (!this.preventLoading) {
+                    console.log('remove id');
+                    this.doctorID = null;
                     this.debouncedGetData(newValue);
                 }
 
-                this.loadMore = true;
+                this.preventLoading = false;
             },
         },
         computed: {
@@ -101,8 +108,19 @@
                 'updateSelectedBranches',
                 'updateSelectedBranch',
                 'changeCurrentStep',
+                'updateInitialFormStep',
+                'resetState',
             ]),
             ...mapActions(['loadDoctorsList', 'submitSelectedDoctor']),
+
+            gotoSpecialization() {
+                this.resetState();
+
+                window.doctor = null;
+
+                this.$store.dispatch('loadInitialData', true);
+            },
+
             triggerCallback() {
                 const vm = this;
                 this.$modal.show(
@@ -133,41 +151,58 @@
                 this.doctorID = doctor.id;
 
                 this.showList = false;
-                this.loadMore = false;
+                this.preventLoading = true;
 
                 this.updateSelectedDoctor(doctor);
             },
             submit() {
-                this.submitSelectedDoctor(this.doctorID).then(data => {
-                    this.changeCurrentStep('timeStep');
-                })
-
+                this.preventSubmit = true;
+                this.submitSelectedDoctor(this.doctorID)
+                    .then((data) => {
+                        this.updateInitialFormStep('nameStep');
+                        this.changeCurrentStep('timeStep');
+                    })
+                    .catch((e) => {
+                        this.preventSubmit = false;
+                        this.updateSelectedDoctor(null);
+                        this.doctorName = '';
+                        this.doctorID = null;
+                    });
             },
             getData(val) {
-                this.error = false;
-                this.loadDoctorsList(val).then((data) => {
-                    if (data.error) {
-                        this.error = true;
-                    } else if (data.doctors) {
-                        this.doctors = data.doctors;
-                        this.showList = true;
-                    }
-                });
-            },
+                this.empty = false;
+                if (val.length <= 2 || this.loading || this.preventLoading) return;
 
-            update() {},
+                this.loading = true;
+                this.loadDoctorsList(val)
+                    .then((data) => {
+                        this.loading = false;
+                        if (data.empty) {
+                            this.empty = true;
+                        } else if (data.doctors) {
+                            this.doctors = data.doctors;
+                            this.showList = true;
+                        }
+                    })
+                    .catch((e) => {
+                        this.loading = false;
+                    });
+            },
         },
         mounted() {
-            this.updateSelectedDoctor(null);
-            this.updateSelectedSpecialization(null);
-            this.updateSelectedBranches(null);
-            this.updateSelectedBranch(null);
-
             this.debouncedGetData = debounce(this.getData, 500);
 
-            setTimeout(this.update, 5000);
+            this.$root.$on('typeUpdate', (e) => {
+                this.updateSelectedDoctor(null);
+                this.doctorName = '';
+                this.doctorID = null;
+            });
 
             new SimpleBar(this.$refs.doctorsDropdown);
+        },
+
+        destroyed() {
+            this.$root.$off('typeUpdate');
         },
     };
 </script>

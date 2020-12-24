@@ -95,6 +95,7 @@
 
 <script>
     const successImage = require('@/assets/images/success.svg');
+    import http from '@/http';
 
     export default {
         name: 'CallbackModal',
@@ -123,8 +124,8 @@
                     comment: this.comment,
                 };
 
-                this.$axios
-                    .get('http://mc21.glavnaya.com/app/ajax/order/call_request.php', {
+                http
+                    .get('/form/call_request.php', {
                         params: {
                             ...formData
                         },

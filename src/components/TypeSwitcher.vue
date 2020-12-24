@@ -5,7 +5,7 @@
                 v-for="type in types"
                 :key="type.id"
                 class="type-switcher__button"
-                :class="{selected: type.selected}"
+                :class="{selected: type.active}"
                 @click="toggleType(type)"
             >{{ type.name }}</button>
             <!-- <button
@@ -23,8 +23,7 @@
     export default {
         name: 'TypeSwitcher',
         data() {
-            return {
-            };
+            return {};
         },
         computed: {
             types() {
@@ -33,17 +32,16 @@
         },
         methods: {
             toggleType(type) {
-                if (type.selected) return;
+                if (type.active) return;
 
-                this.$root.$emit('typeUpdate')
+                const currentStep = this.$store.state.currentStep;
+                if (currentStep === 'timeStep' || currentStep === 'formStep') {
+                    this.resetToFirstStep();
+                }
 
-                this.loadSpecializationsList(type);
-                this.setActiveSpecializationsType(type)
-                this.changeCurrentStep('specializationStep');
+                this.setActiveSpecializationsType(type);
 
-                // this.updateSelectedSpecialization(null)
-                // this.updateSelectedBranches(null)
-                // this.updateSelectedDoctor(null)
+                this.$root.$emit('typeUpdate');
             },
 
             ...mapMutations([
@@ -52,10 +50,9 @@
                 'updateSelectedDoctor',
                 'changeCurrentStep',
                 'setActiveSpecializationsType',
+                'resetState',
             ]),
-            ...mapActions([
-                'loadSpecializationsList'
-            ])
+            ...mapActions(['loadSpecializationsList', 'loadInitialData', 'resetToFirstStep']),
         },
     };
 </script>

@@ -2,6 +2,7 @@
     <div
         class="v-doctor-card"
         :data-doctor-id='doctorId'
+        :data-shift-id='shiftId'
         :data-branch-id='branchId'
     >
         <div class="info">
@@ -53,10 +54,13 @@
         name: 'DoctorCard',
         props: {
             doctorId: {
-                type: Number,
+                type: [String, Number],
+            },
+            shiftId: {
+                type: [String, Number],
             },
             branchId: {
-                type: Number,
+                type: [String, Number],
             },
             doctorData: {
                 type: Object,
@@ -90,11 +94,11 @@
                     const parentCard = e.target.closest('.v-doctor-card');
                     const doctorId = parentCard.dataset.doctorId;
                     const branchId = parentCard.dataset.branchId;
+                    const shiftId = parentCard.dataset.shiftId;
 
-                    debugger;
                     e.target.classList.add('selected');
                     this.updateSelectedTime(e.target.textContent.trim());
-                    this.updateSelectedDoctor({name: this.doctorData.name, id: doctorId});
+                    this.updateSelectedDoctor({name: this.doctorData.name, id: doctorId, shift: shiftId});
                     this.updateSelectedBranch({value: this.address, id: branchId});
                     this.changeCurrentStep('formStep');
                 }

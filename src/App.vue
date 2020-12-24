@@ -4,8 +4,11 @@
         class='online-appointment'
     >
         <div class="inner">
+
             <TypeSwitcher></TypeSwitcher>
-            <div class="online-appointment__body">
+            <div
+                class="online-appointment__body"
+            >
                 <transition
                     name='fade'
                     mode="out-in"
@@ -38,9 +41,6 @@
             TimeStep,
             FormStep,
         },
-        data() {
-            return {};
-        },
         computed: {
             actionStep() {
                 return this.$store.state.currentStep;
@@ -50,9 +50,10 @@
             function getScrollbarWidth() {
                 return window.innerWidth - document.documentElement.clientWidth;
             }
-            this.$store.commit('setScrollbarWidth', getScrollbarWidth())
+            this.$store.commit('setScrollbarWidth', getScrollbarWidth());
 
-            this.$store.dispatch('loadInitialData')
+            this.$store.dispatch('loadInitialData');
+
         },
     };
 </script>

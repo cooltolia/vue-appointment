@@ -91,7 +91,7 @@
                             class="submit"
                             type="submit"
                             @click.prevent="submitForm"
-                            :disabled="!formValid"
+                            :disabled="!formValid || submitDisabled"
                         >Записаться</button>
                     </div>
                     <div class="form-col flex-center">
@@ -110,7 +110,7 @@
 </template>
 
 <script>
-    import { mapMutations } from 'vuex';
+    import { mapActions, mapMutations } from 'vuex';
     import NotifyModal from '@/components/NotifyModal';
     import http from '@/http';
 
@@ -122,6 +122,7 @@
 
                 selectedDoctor: {},
                 selectedBranch: {},
+                selectedService: {},
                 selectedDate: null,
                 selectedTime: null,
 
@@ -132,13 +133,24 @@
 
                 birthdayValid: false,
                 phoneValid: false,
+                submitDisabled: false,
             };
         },
         methods: {
-            ...mapMutations(['changeCurrentStep']),
+            ...mapMutations(['changeCurrentStep', 'updateSelectedDoctor']),
+            ...mapActions(['resetToDefault']),
 
             returnBack(step) {
-                this.changeCurrentStep(step);
+                if (step === 'nameStep') {
+                    this.updateSelectedDoctor(null);
+                    if (this.$store.initialFormStep === 'nameStep') {
+                        this.changeCurrentStep(step);
+                    } else {
+                        this.changeCurrentStep('timeStep');
+                    }
+                } else {
+                    this.changeCurrentStep(step);
+                }
 
                 this.$scrollTo('#onlineAppointment', 300);
             },
@@ -158,10 +170,7 @@
             },
             submitForm() {
                 const vm = this;
-
-                this.changeCurrentStep('specializationStep');
-
-                this.$scrollTo('#onlineAppointment', 300);
+                this.submitDisabled = true;
 
                 const selectedTime = this.selectedTime.split(' — ');
 
@@ -171,19 +180,28 @@
                     name: this.name,
                     comment: this.comment,
                     doctor: this.selectedDoctor.id,
+                    shift: this.selectedDoctor.shift,
                     branch: this.selectedBranch.id,
                     day: this.$store.state.selectedDate.id,
                     time_from: selectedTime[0],
                     time_to: selectedTime[1],
                 };
 
-                http.get('/add.php', {
+                if (this.selectedService?.id) formData.service = this.selectedService.id;
+
+                http.get('/order/add.php', {
                     params: {
                         ...formData,
                     },
+                    cache: false,
                 })
                     .then((response) => {
+                        this.$scrollTo('#onlineAppointment', 300, { offset: -60 });
+                        this.submitDisabled = false;
+
                         if (response.data.success) {
+                            this.resetToDefault();
+
                             this.$modal.show(
                                 NotifyModal,
                                 { type: 'success' },
@@ -207,54 +225,11 @@
                                     },
                                 }
                             );
-                        } else if (data.error) {
-                            this.$modal.show(
-                                NotifyModal,
-                                { type: 'error' },
-                                {
-                                    adaptive: true,
-                                    scrollable: true,
-                                    width: '90%',
-                                    maxWidth: 920,
-                                    height: 'auto',
-                                    minHeight: Infinity,
-                                },
-                                {
-                                    'before-open': (event) => {
-                                        document.body.style.overflow = 'hidden';
-                                        document.body.style.paddingRight =
-                                            vm.$store.state.scrollbarWidth + 'px';
-                                    },
-                                    closed: (event) => {
-                                        document.body.style.overflow = null;
-                                        document.body.style.paddingRight = null;
-                                    },
-                                }
-                            );
-                        } else if (data.error_order) {
-                            this.$modal.show(
-                                NotifyModal,
-                                { type: 'error_order' },
-                                {
-                                    adaptive: true,
-                                    scrollable: true,
-                                    width: '90%',
-                                    maxWidth: 920,
-                                    height: 'auto',
-                                    minHeight: Infinity,
-                                },
-                                {
-                                    'before-open': (event) => {
-                                        document.body.style.overflow = 'hidden';
-                                        document.body.style.paddingRight =
-                                            vm.$store.state.scrollbarWidth + 'px';
-                                    },
-                                    closed: (event) => {
-                                        document.body.style.overflow = null;
-                                        document.body.style.paddingRight = null;
-                                    },
-                                }
-                            );
+                        } else if (response.data.error === 'error_order') {
+                            console.log('asds');
+                        } else {
+                            debugger;
+                            this.changeCurrentStep('timeStep');
                         }
                     })
                     .catch((e) => {
@@ -272,6 +247,7 @@
         mounted() {
             this.selectedDoctor = this.$store.state.selectedDoctor;
             this.selectedBranch = this.$store.state.selectedBranch;
+            this.selectedService = this.$store.state.selectedService;
             this.selectedDate = this.$store.state.selectedDate.value.toLocaleString('ru', {
                 month: 'long',
                 day: 'numeric',
