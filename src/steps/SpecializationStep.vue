@@ -288,7 +288,7 @@
 
     .loader {
         position: absolute;
-        z-index: 2;
+        z-index: 9;
         width: 100%;
         height: 100%;
         top: 0;
