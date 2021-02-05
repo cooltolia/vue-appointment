@@ -1,4 +1,6 @@
 # mc21-appointment
+Модуль онлайн-записи на Vue для проекта
+[21 век](https://github.com/GLSTRCo/mc21).
 
 ## Project setup
 ```
