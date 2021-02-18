@@ -1,9 +1,6 @@
 <template>
     <div
         class="v-doctor-card"
-        :data-doctor-id='doctorId'
-        :data-shift-id='shiftId'
-        :data-branch-id='branchId'
     >
         <div class="info">
             <div class="info-header">
@@ -33,13 +30,13 @@
         </div>
         <div
             class="worktime"
-            @click="timeSelect"
         >
             <button
                 v-for="(time, index) of workTime"
                 :key="index"
                 class="window"
                 type='button'
+                @click="timeSelect($event, time)"
             >
                 {{ time.from }} — {{ time.to }}
             </button>
@@ -54,9 +51,6 @@
         name: 'DoctorCard',
         props: {
             doctorId: {
-                type: [String, Number],
-            },
-            shiftId: {
                 type: [String, Number],
             },
             branchId: {
@@ -89,17 +83,13 @@
                 'updateSelectedBranch',
             ]),
 
-            timeSelect(e) {
+            timeSelect(e, time) {
                 if (e.target.tagName.toLowerCase() === 'button') {
-                    const parentCard = e.target.closest('.v-doctor-card');
-                    const doctorId = parentCard.dataset.doctorId;
-                    const branchId = parentCard.dataset.branchId;
-                    const shiftId = parentCard.dataset.shiftId;
-
                     e.target.classList.add('selected');
+                    console.log(time.id_shift);
                     this.updateSelectedTime(e.target.textContent.trim());
-                    this.updateSelectedDoctor({name: this.doctorData.name, id: doctorId, shift: shiftId});
-                    this.updateSelectedBranch({value: this.address, id: branchId});
+                    this.updateSelectedDoctor({name: this.doctorData.name, id: this.doctorId, shift: time.id_shift});
+                    this.updateSelectedBranch({value: this.address, id: this.branchId});
                     this.changeCurrentStep('formStep');
                 }
             },
