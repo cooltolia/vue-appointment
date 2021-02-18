@@ -13,7 +13,6 @@ http.defaults.timeout = 30000;
 http.interceptors.response.use(
     function(response) {
         if (response.data.error) {
-            console.log(response.data.error);
             customErrorHandler(response.data.error);
         }
         return response;

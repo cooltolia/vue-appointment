@@ -60,6 +60,7 @@
 <style lang="scss" scoped>
     .type-switcher {
         margin-bottom: 40px;
+        height: 36px;
 
         text-align: center;
 

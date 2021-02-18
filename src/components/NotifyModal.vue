@@ -2,7 +2,7 @@
     <div class="notify-modal">
         <div
             class="content success"
-            v-if="type === 'success'"
+            v-if="type === 'success' || type === 'success_request'"
         >
             <img
                 :src="successImage"

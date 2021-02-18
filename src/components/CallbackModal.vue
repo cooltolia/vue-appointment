@@ -20,6 +20,10 @@
                     alt=""
                     class='image'
                 >
+                <div
+                    class="text"
+                    v-html="$store.state.modals['success_request']"
+                ></div>
                 <button
                     type='button'
                     class='button'
@@ -30,6 +34,7 @@
                 action=""
                 class="form"
                 v-else
+                ref='form'
             >
                 <div class="form-title">
                     Заказать звонок коллцентра
@@ -124,15 +129,13 @@
                     comment: this.comment,
                 };
 
-                http
-                    .get('/form/call_request.php', {
-                        params: {
-                            ...formData
-                        },
-                    })
-                    .then(response => {
-                        debugger;
-                    });
+                http.get('/form/call_request.php', {
+                    params: {
+                        ...formData,
+                    },
+                }).then((response) => {
+                    debugger;
+                });
 
                 this.formSended = true;
             },
@@ -143,6 +146,9 @@
                     this.phoneValid = false;
                 }
             },
+        },
+        mounted() {
+            this.$refs.form.elements[0].focus();
         },
     };
 </script>
@@ -213,6 +219,12 @@
         .custom-textarea__input {
             height: 100px;
         }
+    }
+
+    .text {
+        margin: 0 0 16px;
+        font-size: 16px;
+        line-height: 1.6;
     }
 
     .submit {

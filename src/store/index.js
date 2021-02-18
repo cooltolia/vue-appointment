@@ -153,6 +153,7 @@ export default new Vuex.Store({
                 service: window.service,
                 specialization: window.specialization,
                 doctor: window.doctor,
+                type: window.type
             };
 
             /** remove empty parameters */
