@@ -116,6 +116,7 @@
                 phoneValid: false,
             };
         },
+        props: ['specialization'],
         computed: {
             formValid() {
                 return this.phoneValid;
@@ -123,21 +124,30 @@
         },
         methods: {
             submitForm() {
-                const formData = {
+                const data = {
                     name: this.name,
                     phone: this.phone,
                     comment: this.comment,
+                    type: 'online'
                 };
+                console.log(this.specialization);
+                const formData = new FormData();
 
-                http.get('/form/call_request.php', {
-                    params: {
-                        ...formData,
-                    },
-                }).then((response) => {
-                    debugger;
+                for (let key in data) {
+                    formData.append(key, data[key]);
+                }
+
+                if (this.specialization) {
+                    formData.append('specialization', this.specialization);
+                }
+
+                this.$store.dispatch('fireCaptcha').then((token) => {
+                    formData.append('recaptcha', token);
+                    http.post('/form/call_request.php', formData).then((response) => {
+                        debugger;
+                        this.formSended = true;
+                    });
                 });
-
-                this.formSended = true;
             },
             phoneValidate(field) {
                 if (field.target.inputmask.isComplete()) {

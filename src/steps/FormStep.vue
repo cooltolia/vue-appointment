@@ -168,13 +168,24 @@
                     this.phoneValid = false;
                 }
             },
+            fireCaptcha(action = '') {
+                return new Promise((resolve) => {
+                    grecaptcha.ready(function () {
+                        grecaptcha
+                            .execute('6Ld9VrAaAAAAALxZz_myMSai7v97HyRhX7iSWD3C', { action })
+                            .then(function (token) {
+                                resolve(token);
+                            });
+                    });
+                });
+            },
             submitForm() {
                 const vm = this;
                 this.submitDisabled = true;
 
                 const selectedTime = this.selectedTime.split(' — ');
 
-                const formData = {
+                const data = {
                     birthday: this.birthday,
                     phone: this.phone,
                     name: this.name,
@@ -187,56 +198,59 @@
                     time_to: selectedTime[1],
                 };
 
-                if (this.selectedService?.id) formData.service = this.selectedService.id;
+                if (this.selectedService?.id) data.service = this.selectedService.id;
 
-                http.get('/order/add.php', {
-                    params: {
-                        ...formData,
-                    },
-                    cache: false,
-                })
-                    .then((response) => {
-                        this.$scrollTo('#onlineAppointment', 300, { offset: -60 });
-                        this.submitDisabled = false;
+                const formData = new FormData();
+                for (let key in data) {
+                    formData.append(key, data[key]);
+                }
 
-                        if (response.data.success) {
-                            this.resetToDefault();
+                this.fireCaptcha().then((token) => {
+                    formData.append('recaptcha', token);
 
-                            this.$modal.show(
-                                NotifyModal,
-                                { type: 'success' },
-                                {
-                                    adaptive: true,
-                                    scrollable: true,
-                                    width: '90%',
-                                    maxWidth: 920,
-                                    height: 'auto',
-                                    minHeight: Infinity,
-                                },
-                                {
-                                    'before-open': (event) => {
-                                        document.body.style.overflow = 'hidden';
-                                        document.body.style.paddingRight =
-                                            vm.$store.state.scrollbarWidth + 'px';
+                    http.post('/order/add.php', formData, { cache: false })
+                        .then((response) => {
+                            this.$scrollTo('#onlineAppointment', 300, { offset: -60 });
+                            this.submitDisabled = false;
+
+                            if (response.data.success) {
+                                this.resetToDefault();
+
+                                this.$modal.show(
+                                    NotifyModal,
+                                    { type: 'success' },
+                                    {
+                                        adaptive: true,
+                                        scrollable: true,
+                                        width: '90%',
+                                        maxWidth: 920,
+                                        height: 'auto',
+                                        minHeight: Infinity,
                                     },
-                                    closed: (event) => {
-                                        document.body.style.overflow = null;
-                                        document.body.style.paddingRight = null;
-                                    },
-                                }
-                            );
-                        } else if (response.data.error === 'error_order') {
-                            console.log('asds');
-                        } else {
-                            debugger;
-                            this.changeCurrentStep('timeStep');
-                        }
-                    })
-                    .catch((e) => {
-                        {
-                            console.log(e);
-                        }
-                    });
+                                    {
+                                        'before-open': (event) => {
+                                            document.body.style.overflow = 'hidden';
+                                            document.body.style.paddingRight =
+                                                vm.$store.state.scrollbarWidth + 'px';
+                                        },
+                                        closed: (event) => {
+                                            document.body.style.overflow = null;
+                                            document.body.style.paddingRight = null;
+                                        },
+                                    }
+                                );
+                            } else if (response.data.error === 'error_order') {
+                            } else {
+                                debugger;
+                                this.changeCurrentStep('timeStep');
+                            }
+                        })
+                        .catch((e) => {
+                            {
+                                console.log(e);
+                            }
+                        });
+                });
             },
         },
         computed: {

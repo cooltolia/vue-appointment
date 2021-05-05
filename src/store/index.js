@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 import http from '@/http';
+import { postData } from '@/common/ajax';
 
 const getDefaultState = () => {
     return {
@@ -15,6 +16,7 @@ const getDefaultState = () => {
         currentSpecializationsType: {},
         specializationsList: [],
         branchesList: [],
+        servicesList: [],
         doctorsList: [],
 
         selectedSpecialization: null,
@@ -42,18 +44,21 @@ const resetDefaultState = (state, ingnoreFields = []) => {
         if (ingnoreFields.indexOf(key) >= 0) return;
         state[key] = defaultState[key];
     }
-}
+};
 
 export default new Vuex.Store({
     state: getDefaultState(),
 
     mutations: {
         resetState(state) {
-            return resetDefaultState(state)
+            return resetDefaultState(state);
         },
 
         resetToFirstStep(state) {
-            return resetDefaultState(state, ['specializationsTypes', 'currentSpecializationsTypes'])
+            return resetDefaultState(state, [
+                'specializationsTypes',
+                'currentSpecializationsTypes',
+            ]);
         },
 
         setScrollbarWidth(state, value) {
@@ -69,7 +74,7 @@ export default new Vuex.Store({
         },
 
         updateInitialFormStep(state, step) {
-            state.initialFormStep = step
+            state.initialFormStep = step;
         },
 
         updateSpecializationsList(state, list) {
@@ -98,6 +103,10 @@ export default new Vuex.Store({
             state.branchesList = list;
         },
 
+        updateServicesList(state, list) {
+            state.servicesList = list;
+        },
+
         updateDoctorsList(state, list) {
             state.doctorsList = list;
         },
@@ -108,6 +117,10 @@ export default new Vuex.Store({
 
         updateSelectedBranches(state, arr) {
             state.selectedBranches = arr;
+        },
+
+        updateSelectedService(state, item) {
+            state.selectedService = item;
         },
 
         updateSelectedBranch(state, value) {
@@ -145,6 +158,20 @@ export default new Vuex.Store({
         },
     },
     actions: {
+        fireCaptcha() {
+            return new Promise((resolve) => {
+                grecaptcha.ready(function() {
+                    grecaptcha
+                        .execute('6Ld9VrAaAAAAALxZz_myMSai7v97HyRhX7iSWD3C', {
+                            action: 'calculation',
+                        })
+                        .then(function(token) {
+                            resolve(token);
+                        });
+                });
+            });
+        },
+
         loadInitialData({ commit, state, dispatch }, reset = false) {
             /** first check the store */
             if (state.specializationsList.length > 0) return;
@@ -153,7 +180,7 @@ export default new Vuex.Store({
                 service: window.service,
                 specialization: window.specialization,
                 doctor: window.doctor,
-                type: window.type
+                type: window.type,
             };
 
             /** remove empty parameters */
@@ -163,11 +190,12 @@ export default new Vuex.Store({
                 }
             }
 
-            const query = !reset ? new URLSearchParams(params) : '';
+            const postData = !reset ? new formDataFromObject(params) : new FormData();
 
-            http.get(`/order/types.php?${query}`, { cache: false }).then((response) => {
+            http.post('/order/types.php', postData, { cache: false }).then((response) => {
                 commit('updateSpecializationsTypes', response.data.types);
-                http.get(`/order/subjects.php?type=${response.data.types[0].id}&${query}`, {
+                postData.append('type', response.data.types[0].id);
+                http.post('/order/subjects.php', postData, {
                     cache: false,
                 }).then((response) => {
                     if (response.data.service) {
@@ -188,7 +216,7 @@ export default new Vuex.Store({
                 });
             });
 
-            http.get('/order/info.php')
+            http.post('/order/info.php')
                 .then((response) => {
                     commit('updatePrivacyPolicy', response.data.privacy_policy);
                     commit('updateModalsContent', response.data.modals);
@@ -213,9 +241,10 @@ export default new Vuex.Store({
                 }
             }
 
-            const query = !reset ? new URLSearchParams(params) : '';
+            const postData = !reset ? formDataFromObject(params) : new FormData();
+            postData.append('type', id);
 
-            http.get(`/order/subjects.php?type=${id}&${query}`).then((response) => {
+            http.post('/order/subjects.php', postData).then((response) => {
                 commit('updateSpecializationsList', response.data.specializations);
             });
         },
@@ -223,24 +252,39 @@ export default new Vuex.Store({
         loadBranchesList({ commit }, data) {
             commit('updateBranchesList', []);
             const key = Object.keys(data)[0];
+            const postData = new FormData();
+            postData.append(key, data[key].id);
+
             return new Promise((resolve) => {
-                http.get(`/order/branches.php?${key}=${data[key].id}`).then((response) => {
+                http.post('/order/branches.php', postData).then((response) => {
                     commit('updateBranchesList', response.data.branches);
                     resolve(response.data.branches);
                 });
             });
         },
 
+        loadServicesList({ commit, state }, data) {
+            commit('updateServicesList', []);
+            const key = Object.keys(data)[0];
+            const postData = new FormData();
+            postData.append(key, data[key].id);
+            postData.append('type', state.currentSpecializationsType);
+
+            return new Promise((resolve) => {
+                http.post('/order/services.php', postData).then((response) => {
+                    commit('updateServicesList', response.data.services);
+                    resolve(response.data.services);
+                });
+            });
+        },
+
         loadDoctorsList({ commit, state }, name) {
             commit('updateDoctorsList', []);
+            const postData = new FormData();
+            postData.append('name', name);
+            postData.append('type', state.currentSpecializationsType.id);
             return new Promise((resolve, reject) => {
-                http.get(
-                    '/order/doctors.php?' +
-                        'name=' +
-                        name +
-                        '&type=' +
-                        state.currentSpecializationsType.id
-                ).then((response) => {
+                http.post('/order/doctors.php', postData).then((response) => {
                     if (response.data.error) {
                         reject(response.data.error);
                     } else {
@@ -251,23 +295,28 @@ export default new Vuex.Store({
             });
         },
 
-        submitSelectedDoctor({ commit, state }, id) {
+        submitSelectedDoctor({ commit, state, dispatch }, id) {
             return new Promise((resolve, reject) => {
-                http.get(
-                    `/order/schedule.php?doctor=${id}&type=${state.currentSpecializationsType.id}`
-                ).then((response) => {
-                    if (response.data.error) {
-                        reject(response.data.error);
-                    } else {
-                        commit('updatAllTimeSlotsData', response.data);
-                        resolve(response.data);
-                    }
+                dispatch('fireCaptcha').then((token) => {
+                    const formData = new FormData();
+                    formData.append('doctor', id);
+                    formData.append('type', state.currentSpecializationsType.id);
+                    formData.append('recaptcha', token);
+
+                    http.post('/order/schedule.php?', formData).then((response) => {
+                        if (response.data.error) {
+                            reject(response.data.error);
+                        } else {
+                            commit('updatAllTimeSlotsData', response.data);
+                            resolve(response.data);
+                        }
+                    });
                 });
             });
         },
 
-        submitSpecilizationBranchData({ commit, state }, formData) {
-            const params = formData;
+        submitSpecilizationBranchData({ commit, state, dispatch }, data) {
+            const params = data;
 
             /** remove empty parameters */
             for (const key of Object.keys(params)) {
@@ -276,22 +325,24 @@ export default new Vuex.Store({
                 }
             }
 
-            const query = new URLSearchParams(params);
+            const formData = formDataFromObject(params);
+
+            formData.append('type', state.currentSpecializationsType.id);
+
             return new Promise((resolve, reject) => {
-                http.get(
-                    `/order/schedule.php${
-                        Object.keys(params).length > 0 ? `?${query}&` : '?'
-                    }type=${state.currentSpecializationsType.id}`
-                )
-                    .then((response) => {
-                        if (response.data.error) {
-                            reject(response.data.error);
-                        } else {
-                            commit('updatAllTimeSlotsData', response.data);
-                            resolve(response.data);
-                        }
-                    })
-                    .catch((e) => reject(e));
+                dispatch('fireCaptcha').then((token) => {
+                    formData.append('recaptcha', token);
+                    http.post('/order/schedule.php', formData)
+                        .then((response) => {
+                            if (response.data.error) {
+                                reject(response.data.error);
+                            } else {
+                                commit('updatAllTimeSlotsData', response.data);
+                                resolve(response.data);
+                            }
+                        })
+                        .catch((e) => reject(e));
+                });
             });
         },
 
@@ -308,3 +359,14 @@ export default new Vuex.Store({
     },
     modules: {},
 });
+
+/** @returns {FormData} */
+function formDataFromObject(data) {
+    const formData = new FormData();
+
+    for (let key in data) {
+        formData.append(key, data[key]);
+    }
+
+    return formData;
+}

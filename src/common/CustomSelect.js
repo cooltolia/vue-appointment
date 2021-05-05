@@ -180,6 +180,7 @@ export default class CustomSelect {
                 const selectedItem = {
                     value: selectedValue,
                     id: e.target.dataset.id,
+                    index: e.target.dataset.index,
                 };
                 this.options.onSelect(selectedItem);
             }
@@ -241,7 +242,8 @@ export default class CustomSelect {
             const selectedItem = {
                 value: selectedValue,
                 id: e.target.dataset.id,
-                action,
+                index: e.target.dataset.index,
+                action
             };
             this.options.onSelect(selectedItem);
         }

@@ -3,7 +3,7 @@ import { cacheAdapterEnhancer, throttleAdapterEnhancer } from 'axios-extensions'
 import NotifyModal from '@/components/NotifyModal';
 
 const http = axios.create({
-    baseURL: 'http://mc21.glavnaya.com/app/ajax/',
+    baseURL: '/app/ajax/',
     // headers: { 'Cache-Control': 'no-cache' },
     adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter, 2 * 1000)),
 });

@@ -23,9 +23,10 @@
         >
             <ul class="custom-select__options">
                 <li
-                    v-for='item in items'
+                    v-for='(item, i) in items'
                     :key="item.id"
                     :data-id="item.id"
+                    :data-index="i"
                     class="custom-select__option"
                     tabindex="0"
                 >
@@ -182,6 +183,8 @@
             position: absolute;
             z-index: 9;
             width: 100%;
+            left: 0;
+            min-width: 288px;
             height: auto;
             max-height: 320px;
 

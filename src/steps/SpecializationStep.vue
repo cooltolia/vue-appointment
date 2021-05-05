@@ -22,7 +22,7 @@
                 <template>
                     <div
                         class='input custom-input'
-                        v-if="selectedService"
+                        v-if="selectedService && selectedService.default"
                     >
                         <input
                             class="custom-input__input"
@@ -48,22 +48,40 @@
                         ></custom-select>
                     </div>
                 </template>
-                <div class="select">
-                    <custom-select
-                        ref="branchesSelect"
-                        :items="branches"
-                        :placeholder="'Выберите филиал'"
-                        :name="'appointment_branches'"
-                        :options="{multiple: true, multipleCounterLabel: 'Выбрано филиалов', onSelect: onBranchSelect}"
-                        :disabled="branches.length === 0 || (!selectedSpecializationName && !selectedService)"
-                    ></custom-select>
-                </div>
-
+                <template>
+                    <div
+                        class="select"
+                        v-if="services.length"
+                    >
+                        <custom-select
+                            ref="servicesSelect"
+                            :items="services"
+                            :placeholder="'Выберите услугу'"
+                            :name="'appointment_services'"
+                            :selected='selectedServiceName'
+                            :options="{onSelect: onServiceSelect}"
+                            :disabled="services.length === 0"
+                        ></custom-select>
+                    </div>
+                    <div
+                        class="select"
+                        v-if="branches.length"
+                    >
+                        <custom-select
+                            ref="branchesSelect"
+                            :items="branches"
+                            :placeholder="'Выберите филиал'"
+                            :name="'appointment_branches'"
+                            :options="{multiple: true, multipleCounterLabel: 'Выбрано филиалов', onSelect: onBranchSelect}"
+                            :disabled="branches.length === 0 || (!selectedSpecializationName && !selectedServiceName)"
+                        ></custom-select>
+                    </div>
+                </template>
             </div>
             <div class="actions">
                 <template>
                     <a
-                        v-if="selectedService"
+                        v-if="selectedService && selectedService.default"
                         href="#"
                         class="link bold"
                         @click.prevent='resetSelectedService'
@@ -79,13 +97,24 @@
                     href="#"
                     class="link"
                     @click.prevent="triggerCallback"
+                    v-if='!noSubmitButton'
                 >Заказать звонок коллцентра</a>
-                <button
-                    class='submit'
-                    type="button"
-                    :disabled='!formValid || preventSubmit'
-                    @click.prevent="submit"
-                >Найти приемы</button>
+                <template>
+                    <button
+                        class='submit'
+                        type="button"
+                        :disabled='!formValid || preventSubmit'
+                        @click.prevent="submit"
+                        v-if='!noSubmitButton'
+                    >Найти приемы</button>
+                    <button
+                        class="submit"
+                        @click.prevent="triggerCallback($event, selectedSpecialization.name)"
+                        type="button"
+                        v-if='noSubmitButton'
+                    >Заказать звонок коллцентра</button>
+                </template>
+
             </div>
         </div>
 
@@ -115,14 +144,22 @@
                     { text: 'Осталась пара секунд', delay: 8000 },
                 ],
                 loaderText: '',
-
+                noSubmitButton: false,
                 preventSubmit: false,
             };
         },
         computed: {
             formValid() {
+                if (
+                    (!!this.selectedSpecializationName || this.selectedService?.default) &&
+                    Object.keys(this.selectedBranches).length > 0
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
                 return (
-                    (!!this.selectedSpecializationName || !!this.selectedService) &&
+                    (!!this.selectedSpecializationName || !!this.selectedServiceName) &&
                     !!Object.keys(this.selectedBranches).length > 0
                 );
             },
@@ -132,17 +169,25 @@
             branches() {
                 return this.$store.state.branchesList;
             },
+            services() {
+                return this.$store.state.servicesList;
+            },
             selectedService() {
                 return this.$store.state.selectedService;
             },
             selectedSpecializationName() {
                 return this.$store.state.selectedSpecialization?.name;
             },
+            selectedServiceName() {
+                return this.$store.state.selectedService?.name;
+            },
         },
         methods: {
             ...mapMutations([
                 'updateSelectedSpecialization',
                 'updateSelectedBranches',
+                'updateBranchesList',
+                'updateServicesList',
                 'updateSelectedBranch',
                 'changeCurrentStep',
                 'updateSelectedDoctor',
@@ -152,15 +197,45 @@
             ]),
             ...mapActions([
                 'loadBranchesList',
+                'loadServicesList',
                 'submitSpecilizationBranchData',
                 'loadSpecializationsList',
             ]),
             onSpecializationSelect(item) {
                 this.selectedSpecialization = { name: item.value, id: item.id };
+                this.noSubmitButton = false;
 
-                this.loadBranchesList({ specialization: item });
+                this.updateBranchesList([]);
+                this.updateServicesList([]);
+                this.selectedBranches = {};
+
+                item.disabled = this.specializations[item.index].disabled;
+                item.services = this.specializations[item.index].services;
+
+                if (item.disabled) {
+                    this.noSubmitButton = true;
+                } else if (item.services) {
+                    this.loadServicesList({ specialization: item });
+                } else {
+                    this.loadBranchesList({ specialization: item });
+                }
+
                 this.updateSelectedSpecialization(this.selectedSpecialization);
-                this.$refs.branchesSelect.select.clearSelected();
+                if (this.$refs.branchesSelect) {
+                    this.$refs.branchesSelect.select.clearSelected();
+                }
+            },
+            onServiceSelect(item) {
+                this.updateSelectedService({ name: item.value, id: item.id });
+                this.updateBranchesList([]);
+                this.selectedBranches = {};
+
+                this.loadBranchesList({ service: item });
+                console.log(this.selectedService);
+
+                if (this.$refs.branchesSelect) {
+                    this.$refs.branchesSelect.select.clearSelected();
+                }
             },
             onBranchSelect(selectedValue) {
                 if (selectedValue.action === 'add') {
@@ -169,16 +244,16 @@
                     this.$delete(this.selectedBranches, selectedValue.id);
                 }
 
-                console.log(this.selectedBranches);
-
                 this.updateSelectedBranches(this.selectedBranches);
             },
-            triggerCallback() {
+            triggerCallback($event, specialization = null) {
                 const vm = this;
+                console.log(specialization);
+                console.log(this.selectedSpecialization);
 
                 this.$modal.show(
                     CallbackModal,
-                    {},
+                    {specialization},
                     {
                         adaptive: true,
                         width: '90%',
@@ -207,13 +282,14 @@
                     service: this.selectedService ? this.selectedService.id : null,
                     branches: Object.keys(this.selectedBranches),
                 };
+                console.log(formData);
 
                 this.loader = true;
                 this.updateLoaderText();
 
                 this.submitSpecilizationBranchData(formData)
                     .then(() => {
-                        this.updateInitialFormStep('specializationStep')
+                        this.updateInitialFormStep('specializationStep');
                         this.changeCurrentStep('timeStep');
                     })
                     .finally(() => {
@@ -221,7 +297,7 @@
                         this.loader = false;
                         this.loaderText = '';
 
-                        this.preventSubmit = false
+                        this.preventSubmit = false;
                     });
             },
 
@@ -367,7 +443,7 @@
 
         .select,
         .input {
-            width: 40%;
+            width: 30%;
             flex: 1 1 auto;
             margin: 0 8px;
         }
@@ -452,7 +528,8 @@
                 margin: 0;
             }
 
-            .select {
+            .select,
+            .input {
                 width: 100%;
                 margin: 0 0 16px;
             }
