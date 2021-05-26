@@ -210,9 +210,13 @@ export default class CustomSelect {
 
     multipleSelectLogic(e, selectedValue) {
         const valueDivider = ';';
-        const action = e.target.classList.contains('selected') ? 'remove' : 'add';
+        console.log(e, selectedValue);
+        debugger;
+        const target = e.target;
+        const action = target.classList.contains('selected') ? 'remove' : 'add';
+        const toggleAll = target.dataset.all !== undefined;
         if (action === 'remove') {
-            e.target.classList.remove('selected');
+            target.classList.remove('selected');
             this.multipleCounter--;
 
             if (this.valueInput) {
@@ -222,13 +226,36 @@ export default class CustomSelect {
                     .join(valueDivider);
                 this.dispatchInputChange();
             }
+
+            if (toggleAll) {
+                [...this.optionsList.children]
+                    .filter((li) => li.dataset.id)
+                    .map((li) => li.classList.remove('selected'));
+                this.multipleCounter = 0;
+            } else {
+                [...this.optionsList.children]
+                    .find((el) => el.dataset.all !== undefined)
+                    .classList.remove('selected');
+            }
         } else {
-            e.target.classList.add('selected');
+            target.classList.add('selected');
             this.multipleCounter++;
 
             if (this.valueInput) {
                 this.valueInput.value += selectedValue + valueDivider;
                 this.dispatchInputChange();
+            }
+
+            if (toggleAll) {
+                const options = [...this.optionsList.children]
+                    .filter((li) => li.dataset.id)
+                    .map((li) => li.classList.add('selected'));
+
+                this.multipleCounter = options.length;
+            } else if (this.multipleCounter === this.optionsList.children.length - 1) {
+                [...this.optionsList.children]
+                    .find((el) => el.dataset.all !== undefined)
+                    .classList.add('selected');
             }
         }
 
@@ -243,7 +270,8 @@ export default class CustomSelect {
                 value: selectedValue,
                 id: e.target.dataset.id,
                 index: e.target.dataset.index,
-                action
+                action,
+                toggleAll,
             };
             this.options.onSelect(selectedItem);
         }

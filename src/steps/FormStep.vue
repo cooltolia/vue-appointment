@@ -137,16 +137,23 @@
             };
         },
         methods: {
-            ...mapMutations(['changeCurrentStep', 'updateSelectedDoctor']),
+            ...mapMutations(['changeCurrentStep', 'updateSelectedDoctor', 'updateSelectedService']),
             ...mapActions(['resetToDefault']),
 
             returnBack(step) {
                 if (step === 'nameStep') {
                     this.updateSelectedDoctor(null);
-                    if (this.$store.initialFormStep === 'nameStep') {
+                    if (this.$store.state.initialFormStep === 'nameStep') {
                         this.changeCurrentStep(step);
                     } else {
                         this.changeCurrentStep('timeStep');
+                    }
+                } else if (step === 'specializationStep') {
+                    if (this.$store.state.initialFormStep === 'nameStep') {
+                        this.changeCurrentStep('timeStep');
+                    } else {
+                        this.changeCurrentStep(step);
+                        this.updateSelectedDoctor(null)
                     }
                 } else {
                     this.changeCurrentStep(step);
@@ -259,6 +266,9 @@
             },
         },
         mounted() {
+            const timeData = this.$store.state.allTimeSlotsData;
+            this.title = timeData.title;
+
             this.selectedDoctor = this.$store.state.selectedDoctor;
             this.selectedBranch = this.$store.state.selectedBranch;
             this.selectedService = this.$store.state.selectedService;

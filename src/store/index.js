@@ -38,12 +38,14 @@ const getDefaultState = () => {
     };
 };
 
-const resetDefaultState = (state, ingnoreFields = []) => {
+const resetDefaultState = (ignoreFields = []) => {
     const defaultState = getDefaultState();
-    for (let key in defaultState) {
-        if (ingnoreFields.indexOf(key) >= 0) return;
-        state[key] = defaultState[key];
-    }
+    // for (let key in defaultState) {
+    //     if (ingnoreFields.indexOf(key) >= 0) return;
+    //     state[key] = defaultState[key];
+    // }
+    ignoreFields.forEach((field) => delete defaultState[field]);
+    return defaultState;
 };
 
 export default new Vuex.Store({
@@ -51,14 +53,18 @@ export default new Vuex.Store({
 
     mutations: {
         resetState(state) {
-            return resetDefaultState(state);
+            Object.assign(state, resetDefaultState());
         },
 
         resetToFirstStep(state) {
-            return resetDefaultState(state, [
-                'specializationsTypes',
-                'currentSpecializationsTypes',
-            ]);
+            Object.assign(
+                state,
+                resetDefaultState(['specializationsTypes', 'currentSpecializationsType'])
+            );
+            // return resetDefaultState(state, [
+            //     'specializationsTypes',
+            //     'currentSpecializationsTypes',
+            // ]);
         },
 
         setScrollbarWidth(state, value) {
@@ -202,8 +208,9 @@ export default new Vuex.Store({
                         commit('updateSelectedService', response.data.service);
                         dispatch('loadBranchesList', { service: response.data.service });
                     } else if (response.data.doctor) {
-                        commit('updateSelectedDoctor', response.data.doctor);
                         state.currentStep = 'nameStep';
+                        console.log('set');
+                        commit('updateSelectedDoctor', response.data.doctor);
                     } else {
                         if (response.data.specialization) {
                             commit('updateSelectedSpecialization', response.data.specialization);

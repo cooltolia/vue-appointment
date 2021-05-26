@@ -50,7 +50,6 @@
                 'updateSelectedDoctor',
                 'changeCurrentStep',
                 'setActiveSpecializationsType',
-                'resetState',
             ]),
             ...mapActions(['loadSpecializationsList', 'loadInitialData', 'resetToFirstStep']),
         },

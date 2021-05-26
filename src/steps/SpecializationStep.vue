@@ -35,7 +35,7 @@
                     </div>
                     <div
                         class="select"
-                        v-else
+                        v-if="specializations.length"
                     >
                         <custom-select
                             ref="specializationSelect"
@@ -45,6 +45,7 @@
                             :selected='selectedSpecializationName'
                             :options="{onSelect: onSpecializationSelect}"
                             :disabled="specializations.length === 0"
+                            :key='selectedSpecializationName'
                         ></custom-select>
                     </div>
                 </template>
@@ -109,7 +110,7 @@
                     >Найти приемы</button>
                     <button
                         class="submit"
-                        @click.prevent="triggerCallback($event, selectedSpecialization.name)"
+                        @click.prevent="triggerCallback($event, selectedSpecializationName)"
                         type="button"
                         v-if='noSubmitButton'
                     >Заказать звонок коллцентра</button>
@@ -135,7 +136,6 @@
         },
         data() {
             return {
-                selectedSpecialization: this.$store.state.selectedSpecialization,
                 selectedBranches: {},
                 loader: false,
                 loaderTextArray: [
@@ -176,6 +176,7 @@
                 return this.$store.state.selectedService;
             },
             selectedSpecializationName() {
+                console.log(this.$store.state.selectedSpecialization);
                 return this.$store.state.selectedSpecialization?.name;
             },
             selectedServiceName() {
@@ -202,7 +203,7 @@
                 'loadSpecializationsList',
             ]),
             onSpecializationSelect(item) {
-                this.selectedSpecialization = { name: item.value, id: item.id };
+                const selectedSpecialization = { name: item.value, id: item.id };
                 this.noSubmitButton = false;
 
                 this.updateBranchesList([]);
@@ -220,7 +221,7 @@
                     this.loadBranchesList({ specialization: item });
                 }
 
-                this.updateSelectedSpecialization(this.selectedSpecialization);
+                this.updateSelectedSpecialization(selectedSpecialization);
                 if (this.$refs.branchesSelect) {
                     this.$refs.branchesSelect.select.clearSelected();
                 }
@@ -231,17 +232,28 @@
                 this.selectedBranches = {};
 
                 this.loadBranchesList({ service: item });
-                console.log(this.selectedService);
 
                 if (this.$refs.branchesSelect) {
                     this.$refs.branchesSelect.select.clearSelected();
                 }
             },
             onBranchSelect(selectedValue) {
-                if (selectedValue.action === 'add') {
-                    this.$set(this.selectedBranches, selectedValue.id, selectedValue);
+                if (selectedValue.toggleAll) {
+                    if (selectedValue.action === 'add') {
+                        this.branches.map((el) => {
+                            this.$set(this.selectedBranches, el.id, { value: el.name, id: el.id });
+                        });
+                    } else {
+                        this.branches.map((el) => {
+                            this.selectedBranches = {};
+                        });
+                    }
                 } else {
-                    this.$delete(this.selectedBranches, selectedValue.id);
+                    if (selectedValue.action === 'add') {
+                        this.$set(this.selectedBranches, selectedValue.id, selectedValue);
+                    } else {
+                        this.$delete(this.selectedBranches, selectedValue.id);
+                    }
                 }
 
                 this.updateSelectedBranches(this.selectedBranches);
@@ -249,11 +261,10 @@
             triggerCallback($event, specialization = null) {
                 const vm = this;
                 console.log(specialization);
-                console.log(this.selectedSpecialization);
 
                 this.$modal.show(
                     CallbackModal,
-                    {specialization},
+                    { specialization },
                     {
                         adaptive: true,
                         width: '90%',
@@ -336,15 +347,23 @@
             },
         },
         mounted() {
+            // this.updateBranchesList([]);
+            this.selectedBranches = {};
+            this.updateSelectedBranches(null);
+
             this.$root.$on('typeUpdate', (e) => {
+                // console.log('clear all');
                 this.selectedBranches = {};
+                // this.updateSelectedBranches(null);
                 this.updateSelectedBranches(null);
-                window.specialization = null;
+                this.updateSelectedSpecialization(null);
+                this.updateSelectedService(null);
+                // this.updateSelectedService(null);
+                // this.updateServicesList([])
+                // window.specialization = null;
 
                 if (!this.selectedService && this.$store.state.currentStep === 'specializationStep') {
                     this.loadSpecializationsList(this.$store.state.currentSpecializationsType);
-                    console.log(this.$store.state.currentSpecializationsType);
-                    this.updateSelectedSpecialization(null);
                 }
             });
         },
@@ -439,6 +458,7 @@
             display: flex;
             flex-flow: row nowrap;
             margin: 0 -8px 16px;
+            min-height: 50px;
         }
 
         .select,

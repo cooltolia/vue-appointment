@@ -26,7 +26,7 @@
                 <a
                     class="info-link"
                     href="#"
-                    @click.prevent="returnBack('specializationStep')"
+                    @click.prevent="returnBack('specializationStep', 'specialization')"
                 >Сменить
                 </a>
             </div>
@@ -39,7 +39,7 @@
                 <a
                     class="info-link"
                     href="#"
-                    @click.prevent="returnBack('specializationStep')"
+                    @click.prevent="returnBack('specializationStep', 'service')"
                 >Сменить
                 </a>
             </div>
@@ -52,7 +52,7 @@
                 <a
                     class="info-link"
                     href="#"
-                    @click.prevent="returnBack('specializationStep')"
+                    @click.prevent="returnBack('specializationStep', 'branch')"
                 >Сменить
                 </a>
             </div>
@@ -156,15 +156,31 @@
             },
         },
         methods: {
-            ...mapMutations(['changeCurrentStep', 'updateSelectedDate', 'updateSelectedDoctor']),
+            ...mapMutations([
+                'changeCurrentStep',
+                'updateSelectedDate',
+                'updateSelectedDoctor',
+                'updateSelectedBranches',
+                'updateSelectedSpecialization',
+                'updateSelectedService',
+                'resetState'
+            ]),
 
-            returnBack(step) {
+            returnBack(step, type = '') {
                 this.changeCurrentStep(step);
+                console.log('change step');
                 if (step === 'nameStep') {
-                    this.updateSelectedDoctor(null)
+                    this.updateSelectedDoctor(null);
                 }
 
-                this.$scrollTo('#onlineAppointment', 300, {offset: -60});
+                if (type === 'service') this.updateSelectedService(null)
+                // if (type === 'branch')
+                if (type === 'specialization') {
+                    this.updateSelectedService(null)
+                    this.updateSelectedSpecialization(null)
+                }
+
+                this.$scrollTo('#onlineAppointment', 300, { offset: -60 });
             },
             calendarMounted() {
                 this.calendarReady = true;
@@ -202,7 +218,20 @@
                 this.calendarComponent = 'v-date-picker';
                 // this.scroll = new SimpleBar(this.$refs.doctorsList);
             }, 0);
+
+            // this.$root.$on('typeUpdate', (e) => {
+            //     // this.updateSelectedDoctor(null);
+
+            //     // this.doctorName = '';
+            //     // this.doctorID = null;
+
+            //     // console.log('bvbb');
+            //     this.resetState()
+            // });
         },
+        // destroyed() {
+        //     this.$root.$off('typeUpdate');
+        // },
     };
 </script>
 

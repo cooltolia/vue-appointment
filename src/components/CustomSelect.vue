@@ -22,6 +22,7 @@
             aria-expanded="false"
         >
             <ul class="custom-select__options">
+                <li v-if="options.multiple" data-all class="custom-select__option">Выбрать все</li>
                 <li
                     v-for='(item, i) in items'
                     :key="item.id"

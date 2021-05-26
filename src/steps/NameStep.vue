@@ -1,64 +1,84 @@
 <template>
-    <div class="first-step name-step">
-        <div class="input">
-            <span
-                class="input-error"
-                v-if="empty"
-            >Врачи на найдены</span>
-            <input
-                type="text"
-                name="doctor"
-                placeholder="Введите ФИО врача"
-                v-model="doctorName"
-                autocomplete="off"
-                :readonly="loading"
+    <div class='wrapper'>
+        <transition
+            name="fade"
+            mode='out-in'
+        >
+            <div
+                class="loader"
+                v-if='loader'
             >
-            <transition name="fade">
-                <div
-                    class="dropdown"
-                    aria-expanded="false"
-                    v-show="showList"
-                    ref="doctorsDropdown"
-                >
-                    <ul class='list'>
-                        <li
-                            v-for='doctor in doctors'
-                            :key="doctor.id"
-                            class="item"
-                            tabindex="0"
-                            @click="selectDoctor(doctor)"
-                        >
-                            <span class='name'>
-                                {{ doctor.name }}
-                            </span>
-                            <span class="profession">
-                                {{ doctor.position }}
-                            </span>
-                        </li>
-                    </ul>
-
+                <div class="dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
                 </div>
-            </transition>
-        </div>
-        <div class="actions">
-            <a
-                href="#"
-                class="link bold"
-                @click.prevent="gotoSpecialization"
-            >Найти по специализации</a>
-            <a
-                href="#"
-                class="link"
-                @click.prevent="triggerCallback"
-            >Заказать звонок коллцентра</a>
-            <button
-                class='submit'
-                type="button"
-                :disabled='!formValid || preventSubmit'
-                @click.prevent="submit"
-            >Найти приемы</button>
+                <div class="text">{{ loaderText }}</div>
+            </div>
+        </transition>
+        <div class="first-step name-step">
+            <div class="input">
+                <span
+                    class="input-error"
+                    v-if="empty"
+                >Врачи на найдены</span>
+                <input
+                    type="text"
+                    name="doctor"
+                    placeholder="Введите ФИО врача"
+                    v-model="doctorName"
+                    autocomplete="off"
+                    :readonly="loading"
+                >
+                <transition name="fade">
+                    <div
+                        class="dropdown"
+                        aria-expanded="false"
+                        v-show="showList"
+                        ref="doctorsDropdown"
+                    >
+                        <ul class='list'>
+                            <li
+                                v-for='doctor in doctors'
+                                :key="doctor.id"
+                                class="item"
+                                tabindex="0"
+                                @click="selectDoctor(doctor)"
+                            >
+                                <span class='name'>
+                                    {{ doctor.name }}
+                                </span>
+                                <span class="profession">
+                                    {{ doctor.position }}
+                                </span>
+                            </li>
+                        </ul>
+
+                    </div>
+                </transition>
+            </div>
+            <div class="actions">
+                <a
+                    href="#"
+                    class="link bold"
+                    @click.prevent="gotoSpecialization"
+                >Найти по специализации</a>
+                <a
+                    href="#"
+                    class="link"
+                    @click.prevent="triggerCallback"
+                >Заказать звонок коллцентра</a>
+                <button
+                    class='submit'
+                    type="button"
+                    :disabled='!formValid || preventSubmit'
+                    @click.prevent="submit"
+                >Найти приемы</button>
+            </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -75,6 +95,14 @@
                 doctorID: this.$store.state.selectedDoctor?.id || null,
                 doctors: [],
 
+                loader: false,
+                loaderTextArray: [
+                    { text: 'Ищем подходящие приемы', delay: 5000 },
+                    { text: 'Проверили почти все филиалы', delay: 7000 },
+                    { text: 'Осталась пара секунд', delay: 8000 },
+                ],
+                loaderText: '',
+
                 showList: false,
                 loading: false,
                 preventLoading: false,
@@ -87,7 +115,6 @@
                 this.showList = false;
 
                 if (!this.preventLoading) {
-                    console.log('remove id');
                     this.doctorID = null;
                     this.debouncedGetData(newValue);
                 }
@@ -157,6 +184,10 @@
             },
             submit() {
                 this.preventSubmit = true;
+
+                this.loader = true;
+                this.updateLoaderText();
+
                 this.submitSelectedDoctor(this.doctorID)
                     .then((data) => {
                         this.updateInitialFormStep('nameStep');
@@ -167,8 +198,35 @@
                         this.updateSelectedDoctor(null);
                         this.doctorName = '';
                         this.doctorID = null;
+                    })
+                    .finally(() => {
+                        this.stopLoaderText();
+                        this.loader = false;
+                        this.loaderText = '';
+
+                        this.preventSubmit = false;
                     });
             },
+            updateLoaderText(array = null) {
+                array = array || [...this.loaderTextArray];
+                const item = array.shift();
+                console.log(item);
+
+                if (!item) {
+                    this.stopLoaderText();
+                    return;
+                }
+
+                this._setTimeout = setTimeout(() => {
+                    this.loaderText = item.text;
+                    this.updateLoaderText(array);
+                }, item.delay);
+            },
+
+            stopLoaderText() {
+                clearTimeout(this._setTimeout);
+            },
+
             getData(val) {
                 this.empty = false;
                 if (val.length <= 2 || this.loading || this.preventLoading) return;
@@ -191,11 +249,24 @@
         },
         mounted() {
             this.debouncedGetData = debounce(this.getData, 500);
+            console.log('mounted');
+
+            this.updateSelectedSpecialization(null);
+            this.updateSelectedBranches(null);
+            this.updateSelectedBranch(null);
+
+            // this.updateSelectedDoctor(null);
+
+            // this.doctorName = '';
+            // this.doctorID = null;
 
             this.$root.$on('typeUpdate', (e) => {
                 this.updateSelectedDoctor(null);
+
                 this.doctorName = '';
                 this.doctorID = null;
+
+                console.log('bvbb');
             });
 
             new SimpleBar(this.$refs.doctorsDropdown);
@@ -208,6 +279,79 @@
 </script>
 
 <style lang='scss' scoped>
+    .wrapper {
+        position: relative;
+    }
+
+    .loader {
+        position: absolute;
+        z-index: 99;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        align-items: center;
+
+        background-color: rgba(#fff, 0.9);
+
+        .dots {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            margin-right: 10px;
+
+            background-color: #eee;
+            border-radius: 50%;
+
+            animation: loaderBounce 2s ease infinite;
+
+            &:nth-child(2) {
+                animation-delay: 0.5s;
+            }
+
+            &:nth-child(3) {
+                animation-delay: 1s;
+            }
+
+            &:nth-child(4) {
+                animation-delay: 1.5s;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+
+        .text {
+            position: absolute;
+            left: 50%;
+            bottom: 12px;
+            transform: translateX(-50%);
+
+            font-size: 16px;
+        }
+    }
+
+    @keyframes loaderBounce {
+        from,
+        to {
+            background-color: #eee;
+        }
+
+        50% {
+            background-color: $green;
+        }
+    }
+
     .first-step {
         max-width: 695px;
         margin: 0 auto;
