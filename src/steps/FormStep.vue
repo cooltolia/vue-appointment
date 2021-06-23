@@ -203,6 +203,7 @@
                     day: this.$store.state.selectedDate.id,
                     time_from: selectedTime[0],
                     time_to: selectedTime[1],
+                    type: this.$store.state.currentSpecializationsType.id
                 };
 
                 if (this.selectedService?.id) data.service = this.selectedService.id;

@@ -165,6 +165,7 @@ export default new Vuex.Store({
     },
     actions: {
         fireCaptcha() {
+            // return new Promise((resolve) => resolve(''))
             return new Promise((resolve) => {
                 grecaptcha.ready(function() {
                     grecaptcha
@@ -214,6 +215,9 @@ export default new Vuex.Store({
                     } else {
                         if (response.data.specialization) {
                             commit('updateSelectedSpecialization', response.data.specialization);
+                            if (response.data.specialization.services) {
+                                dispatch('loadServicesList', {specialization: response.data.specialization});
+                            }
                             dispatch('loadBranchesList', {
                                 specialization: response.data.specialization,
                             });
@@ -275,7 +279,7 @@ export default new Vuex.Store({
             const key = Object.keys(data)[0];
             const postData = new FormData();
             postData.append(key, data[key].id);
-            postData.append('type', state.currentSpecializationsType);
+            postData.append('type', state.currentSpecializationsType.id);
 
             return new Promise((resolve) => {
                 http.post('/order/services.php', postData).then((response) => {

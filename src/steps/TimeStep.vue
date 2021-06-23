@@ -95,10 +95,11 @@
                             :key='i'
                         >
                             <DoctorCard
+                                :key='card.doctor.id'
                                 :doctorId='card.doctor.id'
                                 :shiftId='card.doctor.id_shift'
                                 :branchId='card.branch.id'
-                                :doctorData="{avatar: card.doctor.photo, name: card.doctor.name, profession: card.doctor.position}"
+                                :doctorData="{avatar: card.doctor.photo, name: card.doctor.name, profession: card.doctor.position, experience: card.doctor.experience}"
                                 :address='card.branch.name'
                                 :metro='card.branch.address'
                                 :workTime='card.slots'
@@ -152,6 +153,8 @@
                 this.updateSelectedDate({ value: newValue, id: newDate });
                 // if (oldValue) this.optionsList = [];
 
+                this.$refs.doctorsList.SimpleBar.getScrollElement().scrollTop = 0
+
                 this.optionsList = this.$store.state.allTimeSlotsData.schedule[newDate].items;
             },
         },
@@ -163,7 +166,8 @@
                 'updateSelectedBranches',
                 'updateSelectedSpecialization',
                 'updateSelectedService',
-                'resetState'
+                'updateServicesList',
+                'resetState',
             ]),
 
             returnBack(step, type = '') {
@@ -173,11 +177,22 @@
                     this.updateSelectedDoctor(null);
                 }
 
-                if (type === 'service') this.updateSelectedService(null)
+                if (type === 'service') {
+                    this.updateSelectedService(null);
+                    window.service = null;
+
+                    if (!this.$store.state.specializationsList.length) {
+                        this.$store.dispatch(
+                            'loadSpecializationsList',
+                            this.$store.state.currentSpecializationsType
+                        );
+                    }
+                }
                 // if (type === 'branch')
                 if (type === 'specialization') {
-                    this.updateSelectedService(null)
-                    this.updateSelectedSpecialization(null)
+                    this.updateSelectedService(null);
+                    this.updateServicesList([]);
+                    this.updateSelectedSpecialization(null);
                 }
 
                 this.$scrollTo('#onlineAppointment', 300, { offset: -60 });

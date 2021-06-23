@@ -61,7 +61,7 @@
                             :name="'appointment_services'"
                             :selected='selectedServiceName'
                             :options="{onSelect: onServiceSelect}"
-                            :disabled="services.length === 0"
+                            :disabled="services.length === 0 || !selectedSpecializationName"
                         ></custom-select>
                     </div>
                     <div
@@ -74,7 +74,7 @@
                             :placeholder="'Выберите филиал'"
                             :name="'appointment_branches'"
                             :options="{multiple: true, multipleCounterLabel: 'Выбрано филиалов', onSelect: onBranchSelect}"
-                            :disabled="branches.length === 0 || (!selectedSpecializationName && !selectedServiceName)"
+                            :disabled="disableBranchesSelect"
                         ></custom-select>
                     </div>
                 </template>
@@ -162,6 +162,17 @@
                     (!!this.selectedSpecializationName || !!this.selectedServiceName) &&
                     !!Object.keys(this.selectedBranches).length > 0
                 );
+            },
+            disableBranchesSelect() {
+                if (
+                    this.services?.length &&
+                    this.selectedServiceName &&
+                    this.selectedSpecializationName
+                )
+                    return false;
+                if (!this.services?.length && this.selectedSpecializationName) return false;
+                if (!this.services?.length && this.selectedServiceName) return false;
+                return true;
             },
             specializations() {
                 return this.$store.state.specializationsList;
@@ -351,6 +362,12 @@
             this.selectedBranches = {};
             this.updateSelectedBranches(null);
 
+            // if (!this.selectedService && this.$store.state.currentStep === 'specializationStep') {
+            //     console.log('ooops');debugger;
+            //     console.log(this.$store.state.currentSpecializationsType);
+            //     // this.loadSpecializationsList(this.$store.state.currentSpecializationsType);
+            // }
+
             this.$root.$on('typeUpdate', (e) => {
                 // console.log('clear all');
                 this.selectedBranches = {};
@@ -361,7 +378,6 @@
                 // this.updateSelectedService(null);
                 // this.updateServicesList([])
                 // window.specialization = null;
-
                 if (!this.selectedService && this.$store.state.currentStep === 'specializationStep') {
                     this.loadSpecializationsList(this.$store.state.currentSpecializationsType);
                 }

@@ -211,7 +211,6 @@ export default class CustomSelect {
     multipleSelectLogic(e, selectedValue) {
         const valueDivider = ';';
         console.log(e, selectedValue);
-        debugger;
         const target = e.target;
         const action = target.classList.contains('selected') ? 'remove' : 'add';
         const toggleAll = target.dataset.all !== undefined;

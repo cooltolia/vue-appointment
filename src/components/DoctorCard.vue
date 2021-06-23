@@ -1,14 +1,17 @@
 <template>
-    <div
-        class="v-doctor-card"
-    >
+    <div class="v-doctor-card">
         <div class="info">
             <div class="info-header">
-                <div class="avatar">
+                <div
+                    class="avatar"
+                    @click="toggleDoctorInfo"
+                    :class="{toggle: doctorData.experience.years || doctorData.experience.description}"
+                >
                     <img
                         :src="doctorData.avatar"
                         :alt="doctorData.name"
                     >
+                    <i v-if="doctorData.experience.years || doctorData.experience.description">i</i>
                 </div>
                 <div class="info-data">
                     <div class="name">
@@ -19,6 +22,24 @@
                     </div>
                 </div>
             </div>
+            <div
+                class="info-doctor"
+                ref="doctorInfo"
+                v-if="doctorData.experience.years || doctorData.experience.description"
+            >
+                <button
+                    class='close'
+                    @click="toggleDoctorInfo"
+                ></button>
+                <div
+                    class="experience"
+                    v-if='doctorData.experience.years'
+                >Стаж врачебной практики: {{ doctorData.experience.years }}</div>
+                <div
+                    v-if="doctorData.experience.description"
+                    v-html="doctorData.experience.description"
+                ></div>
+            </div>
             <div class="info-address">
                 <div class="address">
                     {{ address }}
@@ -28,9 +49,7 @@
                 </div>
             </div>
         </div>
-        <div
-            class="worktime"
-        >
+        <div class="worktime">
             <button
                 v-for="(time, index) of workTime"
                 :key="index"
@@ -46,6 +65,7 @@
 
 <script>
     import { mapMutations } from 'vuex';
+    import $$ from '@/common/plugins';
 
     export default {
         name: 'DoctorCard',
@@ -62,6 +82,10 @@
                     avatar: '',
                     name: '',
                     profession: '',
+                    experience: {
+                        years: '',
+                        description: '',
+                    },
                 }),
             },
             address: {
@@ -83,13 +107,21 @@
                 'updateSelectedBranch',
             ]),
 
+            toggleDoctorInfo() {
+                if (this.$refs.doctorInfo) $$.slideToggle(this.$refs.doctorInfo);
+            },
+
             timeSelect(e, time) {
                 if (e.target.tagName.toLowerCase() === 'button') {
                     e.target.classList.add('selected');
                     console.log(time.id_shift);
                     this.updateSelectedTime(e.target.textContent.trim());
-                    this.updateSelectedDoctor({name: this.doctorData.name, id: this.doctorId, shift: time.id_shift});
-                    this.updateSelectedBranch({value: this.address, id: this.branchId});
+                    this.updateSelectedDoctor({
+                        name: this.doctorData.name,
+                        id: this.doctorId,
+                        shift: time.id_shift,
+                    });
+                    this.updateSelectedBranch({ value: this.address, id: this.branchId });
                     this.changeCurrentStep('formStep');
                 }
             },
@@ -119,6 +151,7 @@
         }
 
         .avatar {
+            position: relative;
             width: 62px;
             height: 62px;
             flex: 0 0 auto;
@@ -126,12 +159,37 @@
 
             border: 3px solid $green;
             border-radius: 50%;
-            overflow: hidden;
+
+            &.toggle {
+                cursor: pointer;
+            }
 
             img {
                 display: block;
                 width: 100%;
                 height: 100%;
+                border-radius: 50%;
+
+                font-size: 8px;
+            }
+
+            i {
+                position: absolute;
+                width: 16px;
+                height: 16px;
+                bottom: 0;
+                right: -4px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                font-size: 12px;
+                color: $text-color-white;
+                font-weight: 700;
+                font-style: normal;
+
+                background-color: $green;
+                border-radius: 50%;
             }
         }
 
@@ -154,6 +212,7 @@
         .info-address {
             position: relative;
             padding-left: 26px;
+            margin-top: 24px;
             margin-bottom: 24px;
 
             color: $text-color-dark;
@@ -220,6 +279,50 @@
                 &.selected {
                     border-color: $green;
                 }
+            }
+        }
+
+        .info-doctor {
+            display: none;
+            position: relative;
+            width: calc(100% + 80px);
+            margin-left: -40px;
+            padding: 32px 40px;
+            background-color: $bg;
+
+            color: $text-color-dark;
+            font-size: 14px;
+
+            .experience {
+                margin: 0 0 24px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                font-weight: 600;
+            }
+
+            /deep/ p {
+                margin: 0 0 8px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            .close {
+                @include btn-reset;
+                position: absolute;
+                width: 32px;
+                height: 32px;
+                top: 12px;
+                right: 12px;
+
+                background-image: url('~@/assets/images/close.svg');
+                background-size: 18px;
+                background-position: center;
+                background-repeat: no-repeat;
             }
         }
 
