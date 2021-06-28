@@ -105,6 +105,7 @@ export default class CustomSelect {
 
         if (e.type === 'click') {
             this.dropdown.classList.toggle('opened');
+            this.dropdown.parentNode.classList.toggle('opened');
             this.selected.classList.toggle('opened');
 
             this.dropdown.setAttribute('aria-expanded', this.dropdown.classList.contains('opened'));

@@ -452,6 +452,7 @@
             transform: translateX(-50%);
 
             font-size: 16px;
+            text-align: center;
         }
     }
 

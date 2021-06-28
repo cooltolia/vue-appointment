@@ -22,7 +22,11 @@
             aria-expanded="false"
         >
             <ul class="custom-select__options">
-                <li v-if="options.multiple" data-all class="custom-select__option">Выбрать все</li>
+                <li
+                    v-if="options.multiple"
+                    data-all
+                    class="custom-select__option"
+                >Выбрать все</li>
                 <li
                     v-for='(item, i) in items'
                     :key="item.id"
@@ -89,6 +93,10 @@
         &.disabled {
             opacity: 0.5;
             pointer-events: none;
+        }
+
+        &.opened {
+            z-index: 99;
         }
 
         &:focus-within {
@@ -185,7 +193,6 @@
             z-index: 9;
             width: 100%;
             left: 0;
-            min-width: 288px;
             height: auto;
             max-height: 320px;
 

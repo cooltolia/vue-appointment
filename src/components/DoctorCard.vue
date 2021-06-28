@@ -316,8 +316,8 @@
                 position: absolute;
                 width: 32px;
                 height: 32px;
-                top: 12px;
-                right: 12px;
+                top: 6px;
+                right: 24px;
 
                 background-image: url('~@/assets/images/close.svg');
                 background-size: 18px;
@@ -340,7 +340,7 @@
                 padding: 24px 20px 8px;
 
                 button {
-                    min-width: 100px;
+                    min-width: 110px;
                     height: 40px;
                     margin: 0 8px 16px;
 
