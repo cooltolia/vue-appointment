@@ -165,11 +165,11 @@ export default new Vuex.Store({
     },
     actions: {
         fireCaptcha() {
-            // return new Promise((resolve) => resolve(''))
+            // return new Promise((resolve) => resolve(''));
             return new Promise((resolve) => {
                 grecaptcha.ready(function() {
                     grecaptcha
-                        .execute('6Ld9VrAaAAAAALxZz_myMSai7v97HyRhX7iSWD3C', {
+                        .execute('6LdDp8gaAAAAAGwy86x68-rkIgkHVfLQcK1_Xy1x', {
                             action: 'calculation',
                         })
                         .then(function(token) {
@@ -216,7 +216,9 @@ export default new Vuex.Store({
                         if (response.data.specialization) {
                             commit('updateSelectedSpecialization', response.data.specialization);
                             if (response.data.specialization.services) {
-                                dispatch('loadServicesList', {specialization: response.data.specialization});
+                                dispatch('loadServicesList', {
+                                    specialization: response.data.specialization,
+                                });
                             }
                             dispatch('loadBranchesList', {
                                 specialization: response.data.specialization,

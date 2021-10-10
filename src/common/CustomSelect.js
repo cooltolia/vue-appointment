@@ -127,6 +127,7 @@ export default class CustomSelect {
 
     closeOptionsList() {
         this.dropdown.classList.remove('opened');
+        this.dropdown.parentNode.classList.remove('opened');
         this.selected.classList.remove('opened');
         this.dropdown.setAttribute('aria-expanded', false);
         $$.fadeOut(this.dropdown);
