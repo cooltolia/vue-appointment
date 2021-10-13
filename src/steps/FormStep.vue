@@ -138,7 +138,7 @@
         },
         methods: {
             ...mapMutations(['changeCurrentStep', 'updateSelectedDoctor', 'updateSelectedService']),
-            ...mapActions(['resetToDefault']),
+            ...mapActions(['resetToDefault', 'fireCaptcha']),
 
             returnBack(step) {
                 if (step === 'nameStep') {
@@ -174,17 +174,6 @@
                 } else {
                     this.phoneValid = false;
                 }
-            },
-            fireCaptcha(action = '') {
-                return new Promise((resolve) => {
-                    grecaptcha.ready(function () {
-                        grecaptcha
-                            .execute('6Ld9VrAaAAAAALxZz_myMSai7v97HyRhX7iSWD3C', { action })
-                            .then(function (token) {
-                                resolve(token);
-                            });
-                    });
-                });
             },
             submitForm() {
                 const vm = this;

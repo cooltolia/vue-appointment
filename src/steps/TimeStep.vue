@@ -153,7 +153,7 @@
                 this.updateSelectedDate({ value: newValue, id: newDate });
                 // if (oldValue) this.optionsList = [];
 
-                this.$refs.doctorsList.SimpleBar.getScrollElement().scrollTop = 0
+                this.$refs.doctorsList.SimpleBar.getScrollElement().scrollTop = 0;
 
                 this.optionsList = this.$store.state.allTimeSlotsData.schedule[newDate].items;
             },
@@ -234,19 +234,23 @@
                 // this.scroll = new SimpleBar(this.$refs.doctorsList);
             }, 0);
 
-            // this.$root.$on('typeUpdate', (e) => {
-            //     // this.updateSelectedDoctor(null);
-
-            //     // this.doctorName = '';
-            //     // this.doctorID = null;
-
-            //     // console.log('bvbb');
-            //     this.resetState()
-            // });
+            this.$root.$on('typeUpdate', (e) => {
+                // console.log('clear all');
+                this.selectedBranches = {};
+                this.updateSelectedBranches(null);
+                this.updateSelectedSpecialization(null);
+                this.updateSelectedService(null);
+                if (!this.selectedService && this.$store.state.currentStep === 'specializationStep') {
+                    this.$store.dispatch(
+                        'loadSpecializationsList',
+                        this.$store.state.currentSpecializationsType
+                    );
+                }
+            });
         },
-        // destroyed() {
-        //     this.$root.$off('typeUpdate');
-        // },
+        destroyed() {
+            this.$root.$off('typeUpdate');
+        },
     };
 </script>
 
