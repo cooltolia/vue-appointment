@@ -66,7 +66,7 @@
                         <div class='input'>
                             <input
                                 class='custom-input__input'
-                                v-mask="'99.99.9999'"
+                                v-mask="birthdayMask"
                                 inputmode="numeric"
                                 placeholder="Дата рождения"
                                 v-model="birthday"
@@ -134,6 +134,14 @@
                 birthdayValid: false,
                 phoneValid: false,
                 submitDisabled: false,
+
+                birthdayMask: {
+                    alias: 'dd.mm.yyyy',
+                    // inputFormat: 'dd.mm.yyyy',
+                    placeholder: 'дд.мм.гггг',
+                    min: '01.01.1900',
+                    max: '01.01.2100',
+                },
             };
         },
         methods: {
@@ -153,7 +161,7 @@
                         this.changeCurrentStep('timeStep');
                     } else {
                         this.changeCurrentStep(step);
-                        this.updateSelectedDoctor(null)
+                        this.updateSelectedDoctor(null);
                     }
                 } else {
                     this.changeCurrentStep(step);
@@ -192,7 +200,7 @@
                     day: this.$store.state.selectedDate.id,
                     time_from: selectedTime[0],
                     time_to: selectedTime[1],
-                    type: this.$store.state.currentSpecializationsType.id
+                    type: this.$store.state.currentSpecializationsType.id,
                 };
 
                 if (this.selectedService?.id) data.service = this.selectedService.id;
@@ -211,8 +219,6 @@
                             this.submitDisabled = false;
 
                             if (response.data.success) {
-                                this.resetToDefault();
-
                                 this.$modal.show(
                                     NotifyModal,
                                     { type: 'success' },
@@ -233,12 +239,36 @@
                                         closed: (event) => {
                                             document.body.style.overflow = null;
                                             document.body.style.paddingRight = null;
+                                            this.resetToDefault();
                                         },
                                     }
                                 );
+
                             } else if (response.data.error === 'error_order') {
+                                this.$modal.show(
+                                    NotifyModal,
+                                    { type: 'error_order' },
+                                    {
+                                        adaptive: true,
+                                        scrollable: true,
+                                        width: '90%',
+                                        maxWidth: 920,
+                                        height: 'auto',
+                                        minHeight: Infinity,
+                                    },
+                                    {
+                                        'before-open': (event) => {
+                                            document.body.style.overflow = 'hidden';
+                                            document.body.style.paddingRight =
+                                                vm.$store.state.scrollbarWidth + 'px';
+                                        },
+                                        closed: (event) => {
+                                            document.body.style.overflow = null;
+                                            document.body.style.paddingRight = null;
+                                        },
+                                    }
+                                );
                             } else {
-                                debugger;
                                 this.changeCurrentStep('timeStep');
                             }
                         })
@@ -252,7 +282,7 @@
         },
         computed: {
             formValid() {
-                return this.birthdayValid && this.phoneValid && this.name.trim().length > 3;
+                return this.birthdayValid && this.phoneValid && this.name.trim().length >= 2;
             },
         },
         mounted() {
