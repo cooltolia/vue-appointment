@@ -370,8 +370,9 @@
             margin: 0 0 24px;
 
             color: $text-color;
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 400;
+            text-align: left;
             line-height: 1.3;
         }
 
@@ -464,10 +465,6 @@
         }
 
         @media (max-width: 768px) {
-            .title {
-                font-size: 18px;
-            }
-
             .calendar {
                 width: 276px;
                 min-height: 348px;
