@@ -32,9 +32,13 @@
                     @click="toggleDoctorInfo"
                 ></button>
                 <div
-                    class="experience"
+                    class="main"
                     v-if='doctorData.experience.years'
                 >Стаж врачебной практики: {{ doctorData.experience.years }}</div>
+                <div
+                    class="main"
+                    v-if='doctorData.feature'
+                >Особенности приема: {{ doctorData.feature }}</div>
                 <div
                     v-if="doctorData.experience.description"
                     v-html="doctorData.experience.description"
@@ -86,6 +90,7 @@
                         years: '',
                         description: '',
                     },
+                    feature: null
                 }),
             },
             address: {
@@ -293,7 +298,7 @@
             color: $text-color-dark;
             font-size: 14px;
 
-            .experience {
+            .main {
                 margin: 0 0 24px;
 
                 &:last-child {

@@ -99,7 +99,7 @@
                                 :doctorId='card.doctor.id'
                                 :shiftId='card.doctor.id_shift'
                                 :branchId='card.branch.id'
-                                :doctorData="{avatar: card.doctor.photo, name: card.doctor.name, profession: card.doctor.position, experience: card.doctor.experience}"
+                                :doctorData="{avatar: card.doctor.photo, name: card.doctor.name, profession: card.doctor.position, experience: card.doctor.experience, feature: card.doctor.feature}"
                                 :address='card.branch.name'
                                 :metro='card.branch.address'
                                 :workTime='card.slots'

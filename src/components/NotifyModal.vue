@@ -48,6 +48,13 @@
                 v-html="$store.state.modals[type]"
             >
             </div>
+            <div v-if="type === 'error_schedule'">
+                <button
+                    class="button green"
+                    type='button'
+                    @click.prevent="$emit('close'); triggerCallback($event, selectedSpecializationName)"
+                >Заказать звонок коллцентра</button>
+            </div>
             <button
                 class="button"
                 type='button'
@@ -60,6 +67,7 @@
 <script>
     const successImage = require('@/assets/images/success.svg');
     const errorImage = require('@/assets/images/error.svg');
+    import CallbackModal from '@/components/CallbackModal.vue';
 
     export default {
         name: 'NotifyModal',
@@ -69,6 +77,40 @@
                 successImage,
                 errorImage,
             };
+        },
+        computed: {
+            selectedSpecializationName() {
+                return this.$store.state.selectedSpecialization?.name;
+            },
+        },
+        methods: {
+            triggerCallback($event, specialization = null) {
+                const vm = this;
+                console.log(specialization);
+
+                this.$modal.show(
+                    CallbackModal,
+                    { specialization },
+                    {
+                        adaptive: true,
+                        width: '90%',
+                        maxWidth: 686,
+                        height: 'auto',
+                        scrollable: true,
+                        minHeight: Infinity,
+                    },
+                    {
+                        'before-open': (event) => {
+                            document.body.style.overflow = 'hidden';
+                            document.body.style.paddingRight = vm.$store.state.scrollbarWidth + 'px';
+                        },
+                        closed: (event) => {
+                            document.body.style.overflow = null;
+                            document.body.style.paddingRight = null;
+                        },
+                    }
+                );
+            },
         },
         // methods: {
         //     open() {
@@ -185,6 +227,21 @@
                 color: $text-color;
 
                 background-color: #fff;
+            }
+
+            &.green {
+                color: $text-color-white;
+
+                background-color: $green;
+                border: 2px solid $green;
+
+                &:hover,
+                &:active,
+                &:focus {
+                    color: $text-color;
+
+                    background-color: #fff;
+                }
             }
         }
 
