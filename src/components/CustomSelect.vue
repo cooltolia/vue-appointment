@@ -21,9 +21,10 @@
             class="custom-select__dropdown"
             aria-expanded="false"
         >
+            <slot name="before-dropdown"></slot>
             <ul class="custom-select__options">
                 <li
-                    v-if="options.multiple"
+                    v-if="settings.multiple"
                     data-all
                     class="custom-select__option"
                 >Выбрать все</li>
@@ -34,6 +35,7 @@
                     :data-index="i"
                     class="custom-select__option"
                     tabindex="0"
+                    :class="item.selected ? 'selected' : ''"
                 >
                     {{ item.name }}
                 </li>
@@ -53,7 +55,7 @@
                 default: 'Выберите значение',
             },
             items: Array,
-            options: Object,
+            settings: Object,
             name: String,
             disabled: Boolean,
             selected: String,
@@ -72,7 +74,7 @@
             },
         },
         mounted() {
-            this.select = new СustomSelect(this.$el, this.options);
+            this.select = new СustomSelect(this.$el, this.settings);
 
             this.$root.$on('typeUpdate', () => {
                 this.select.clearSelected();

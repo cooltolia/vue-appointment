@@ -4,22 +4,23 @@ import SimpleBar from 'simplebar';
 export default class CustomSelect {
     /**
      * @param {HTMLElement} select
-     * @param {Object} options
-     * @param {Boolean} options.multiple - multiple choises
-     * @param {String} options.multipleCounterLabel
-     * @param {Function} options.onSelect - callback for selected element
+     * @param {Object} settings
+     * @param {Boolean} settings.multiple - multiple choises
+     * @param {String} settings.multipleCounterLabel
+     * @param {Function} settings.onSelect - callback for selected element
      */
-    constructor(select, options = {}) {
+    constructor(select, settings = {}) {
         if (!select) {
             throw new Error('No element has been passed');
         }
         this.select = select;
-        this.options = options;
+        this.settings = settings;
 
         this.setup();
     }
 
     setup() {
+        console.log('setup');
         this.valueInput = this.select.querySelector('.custom-select__value');
         this.selected = this.select.querySelector('.custom-select__selected');
         this.dropdown = this.select.querySelector('.custom-select__dropdown');
@@ -39,9 +40,42 @@ export default class CustomSelect {
             escape: 27,
         };
 
-        if (this.options.multiple) {
+        if (this.settings.multiple) {
             this.multipleCounter = 0;
             this.optionsList.classList.add('multiple');
+        }
+
+        /** set proper UI if has initial selected options */
+        const initialSelectedOptions = [...this.optionsList.children].filter((el) =>
+            el.classList.contains('selected')
+        );
+
+        if (initialSelectedOptions.length > 0 && this.settings.multiple) {
+            this.multipleCounter = initialSelectedOptions.length;
+            this.selected.textContent = `${this.settings.multipleCounterLabel}: ${this.multipleCounter}`;
+
+            if (this.valueInput) {
+                this.valueInput.value = initialSelectedOptions.reduce(
+                    (acc, el) => (acc += `${el.textContent.trim()};`),
+                    ''
+                );
+            }
+
+            if (initialSelectedOptions.length + 1 === [...this.optionsList.children].length) {
+                [...this.optionsList.children]
+                    .find((el) => el.dataset.all !== undefined)
+                    .classList.add('selected');
+            }
+        } else if (initialSelectedOptions.length === 1) {
+            this.selected.textContent = initialSelectedOptions[0].textContent.trim();
+
+            if (this.valueInput) {
+                this.valueInput.value = this.selected.textContent;
+                this.valueInput.dataset.id = initialSelectedOptions[0].dataset.id;
+            }
+        } else {
+            this.multipleCounter = 0;
+            this.selected.textContent = this.inititalPlaceholder;
         }
 
         this.setEventHandlers();
@@ -160,7 +194,7 @@ export default class CustomSelect {
 
     selectItem(e) {
         const selectedValue = e.target.textContent.trim();
-        if (this.options.multiple) {
+        if (this.settings.multiple) {
             this.multipleSelectLogic(e, selectedValue);
         } else {
             /** clicked item was already selected */
@@ -178,13 +212,13 @@ export default class CustomSelect {
             }
             this.closeOptionsList();
 
-            if (typeof this.options.onSelect === 'function') {
+            if (typeof this.settings.onSelect === 'function') {
                 const selectedItem = {
                     value: selectedValue,
                     id: e.target.dataset.id,
                     index: e.target.dataset.index,
                 };
-                this.options.onSelect(selectedItem);
+                this.settings.onSelect(selectedItem);
             }
         }
     }
@@ -263,10 +297,10 @@ export default class CustomSelect {
         if (this.multipleCounter === 0) {
             this.selected.textContent = this.inititalPlaceholder;
         } else {
-            this.selected.textContent = `${this.options.multipleCounterLabel}: ${this.multipleCounter}`;
+            this.selected.textContent = `${this.settings.multipleCounterLabel}: ${this.multipleCounter}`;
         }
 
-        if (typeof this.options.onSelect === 'function') {
+        if (typeof this.settings.onSelect === 'function') {
             const selectedItem = {
                 value: selectedValue,
                 id: e.target.dataset.id,
@@ -274,7 +308,7 @@ export default class CustomSelect {
                 action,
                 toggleAll,
             };
-            this.options.onSelect(selectedItem);
+            this.settings.onSelect(selectedItem);
         }
     }
 

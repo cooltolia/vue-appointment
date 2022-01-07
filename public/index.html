@@ -2,64 +2,65 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title>
-        <%= htmlWebpackPlugin.options.title %>
-    </title>
-    <link rel="stylesheet" href="<%= BASE_URL %>/normalize.css">
-    <style>
-        @font-face {
-            font-family: 'Open Sans';
-            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Light.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Light.woff') format('woff');
-            font-weight: 300;
-            font-style: normal;
-        }
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
+  <link rel="stylesheet" href="<%= BASE_URL %>/normalize.css">
+  <style>
+    @font-face {
+      font-family: 'Open Sans';
+      src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Light.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Light.woff') format('woff');
+      font-weight: 300;
+      font-style: normal;
+    }
 
-        @font-face {
-            font-family: 'Open Sans';
-            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Regular.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Regular.woff') format('woff');
-            font-weight: normal;
-            font-style: normal;
-        }
+    @font-face {
+      font-family: 'Open Sans';
+      src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Regular.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Regular.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
 
-        @font-face {
-            font-family: 'Open Sans';
-            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-SemiBold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-SemiBold.woff') format('woff');
-            font-weight: 600;
-            font-style: normal;
-        }
+    @font-face {
+      font-family: 'Open Sans';
+      src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-SemiBold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-SemiBold.woff') format('woff');
+      font-weight: 600;
+      font-style: normal;
+    }
 
-        @font-face {
-            font-family: 'Open Sans';
-            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Bold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Bold.woff') format('woff');
-            font-weight: 700;
-            font-style: normal;
-        }
+    @font-face {
+      font-family: 'Open Sans';
+      src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Bold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-Bold.woff') format('woff');
+      font-weight: 700;
+      font-style: normal;
+    }
 
-        @font-face {
-            font-family: 'Open Sans';
-            src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-ExtraBold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-ExtraBold.woff') format('woff');
-            font-weight: 800;
-            font-style: normal;
-        }
-    </style>
+    @font-face {
+      font-family: 'Open Sans';
+      src: url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-ExtraBold.woff2') format('woff2'), url('<%= BASE_URL %>/fonts/OpenSans/OpenSans-ExtraBold.woff') format('woff');
+      font-weight: 800;
+      font-style: normal;
+    }
+  </style>
 </head>
 
 <body>
-    <noscript>
-        <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <script>
-        // window.service = 226;
-        // window.doctor = 1042;
-        // window.specialization = 3792;
-        // window.type = 1793;
-    </script>
-    <div id="onlineAppointment"></div>
-    <!-- built files will be auto injected -->
+  <noscript>
+    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+  </noscript>
+  <script>
+    // window.service = 226;
+    // window.doctor = 1042;
+    // window.specialization = 3792;
+    // window.type = 1793;
+    window.branches = { "type": "FeatureCollection", "zoom": 8, "api": "https:\/\/api-maps.yandex.ru\/2.1\/?apikey=c1ebd1aa-95d9-4731-bfdc-69025a81c336\u0026lang=ru_RU", "mapCenter": ["59.969609", "30.341971"], "features": [{ "id": "34", "name": "Большой Сампсониевский пр., д. 45", "address": "проспект Большой Сампсониевский, дом 45", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 20:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-sampsonievskiy-45\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.969609", "30.341971"] } }, { "id": "35", "name": "Моравский пер., д. 3, к. 2", "address": "переулок Моравский, дом 3, корпус 2", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 15:00, 01-02.01.22 - Выходной, с 03.01.22 - в обычном режиме.", "url": "\/branch\/ap-moravskiy-3\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.836457", "30.420586"] } }, { "id": "36", "name": "Гастелло ул., д. 22", "address": "улица Гастелло, дом 22", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-gastello-22\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.858495", "30.327493"] } }, { "id": "37", "name": "Сикейроса ул., д. 7, к. 2", "address": "улица Сикейроса, дом 7, корпус 2", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 15:00, 01-09.01.22 - Выходной, с 10.01.22 - в обычном режиме.", "url": "\/branch\/ap-sikeyrosa-7\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.033484", "30.327733"] } }, { "id": "38", "name": "Коломяжский пр., д. 28", "address": "проспект Коломяжский, дом 28", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-kolomyazhskiy-28\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.007141", "30.294965"] } }, { "id": "39", "name": "Кима пр., д. 28", "address": "проспект Кима, дом 28", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 15:00, 01-02.01.22 - Выходной, с 03.01.22 - в обычном режиме.", "url": "\/branch\/ap-kima-28\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.953835", "30.242211"] } }, { "id": "40", "name": "Старо-Петергофский пр., д. 39а", "address": "проспект Старо-Петергофский, дом 39а", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-staro-petergofskiy-39\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.902989", "30.275719"] } }, { "id": "41", "name": "Брянцева ул., д. 13, к. 1", "address": "улица Брянцева, дом 13, корпус 1", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-bryantseva-13\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.039831", "30.408095"] } }, { "id": "42", "name": "Пограничника Гарькавого ул., д. 15, к. 3", "address": "улица Пограничника Гарькавого, дом 15, корпус 3", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-garkavogo-15\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.840155", "30.14535"] } }, { "id": "43", "name": "Маршака пр., д. 4", "address": "проспект Маршака, дом 4", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 15:00, 01-02.01.22 - Выходной, с 03.01.22 - в обычном режиме.", "url": "\/branch\/ap-marshaka-4\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.035369", "30.446215"] } }, { "id": "44", "name": "Валерия Гаврилина ул., д. 11, к.1", "address": "улица Валерия Гаврилина, дом 11, корпус 1", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-gavrilina-11-1\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.078697727776", "30.337247788361"] } }, { "id": "45", "name": "Щербакова ул., д. 11", "address": "улица Щербакова, дом 11", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 15:00, 01-09.01.22 - Выходной, с 10.01.22 - в обычном режиме.", "url": "\/branch\/ap-shcherbakova-11\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.028754", "30.296336"] } }, { "id": "46", "name": "Богатырский пр., д. 49, к. 1", "address": "проспект Богатырский, дом 49, корпус 1", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 15:00, 01-02.01.22 - Выходной, с 03.01.22 - в обычном режиме.", "url": "\/branch\/ap-bogatyrskiy-49\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.00594", "30.223606"] } }, { "id": "47", "name": "Коллонтай ул., д. 4", "address": "улица Коллонтай, дом 4", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-kollontay-4\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.914851", "30.446849"] } }, { "id": "48", "name": "Ленская ул., д. 17", "address": "улица Ленская, дом 17", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-lenskaya-17\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.939888528945", "30.493999169312"] } }, { "id": "49", "name": "Марата ул., д. 48", "address": "улица Марата, дом 48", "working_hours": "08:00-22:00 Режим работы в новогодние праздники: 31.12.21 - с 08:00 до 15:00, 01-09.01.22 - Выходной, с 10.01.22 - в обычном режиме.", "url": "\/branch\/ap-marata-48\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.924335", "30.351376"] } }, { "id": "51", "name": "Шаврова ул., д. 26", "address": "улица Шаврова, дом 26", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-shavrova-26\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.027322844808", "30.241836271164"] } }, { "id": "52", "name": "Реабилитационный центр (пр. Энгельса, д. 107, корп. 4, стр. 1)", "address": "проспект Энгельса, дом 107, корпус 4, строение 1", "working_hours": "08:00-22:00", "url": "\/branch\/reabilitatsionnyy-tsentr\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.032084681416", "30.320862286215"] } }, { "id": "53", "name": "Стационарзамещающий операционный комплекс (СОК)", "address": "проспект Энгельса, дом 107, корпус 4, строение 1", "working_hours": "08:00-22:00", "url": "\/branch\/tsakh-ooo-tsentr-ambulatornoy-khirurgii-mts-khkhi-vek\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.032038681813", "30.321056250854"] } }, { "id": "55", "name": "ул. Коллонтай, д. 6, к. 1 (стоматология)", "address": "улица Коллонтай, дом 6, корпус 1", "working_hours": "08:00-21:00 Режим работы в новогодние праздники: 31.12.21 - с 08:00 до 15:00, 01-02.01.22 - Выходной, с 03.01.22 - в обычном режиме.", "url": "\/branch\/ap-kollontay-6\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.915554", "30.450479"] } }, { "id": "1752", "name": "ул. Жукова, д. 18 (Медицинский центр доктора Добродеева)", "address": "улица Жукова, дом 18", "working_hours": "08:00 – 18:00", "url": "\/branch\/zhukova-18-ooo-meditsinskiy-tsentr-doktora-dobrodeeva\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["59.966376", "30.38785"] } }, { "id": "4732", "name": "пр. Энгельса, д. 107, к.4, стр. 1", "address": "проспект Энгельса, дом 107, корпус 4, строение 1", "working_hours": "07:30-22:00 Режим работы в новогодние праздники: 31.12.21 - с 07:30 до 18:00, 01.01.22 - Выходной, с 02.01.22 - в обычном режиме.", "url": "\/branch\/ap-engelsa\/", "type": "Feature", "geometry": { "type": "Point", "coordinates": ["60.032040985548", "30.321048296622"] } }] };
+  </script>
+  <div id="onlineAppointment"></div>
+  <!-- built files will be auto injected -->
 </body>
 
 </html>

@@ -18,6 +18,14 @@ Vue.use(VueScrollTo);
 
 import 'simplebar/dist/simplebar.css';
 
+import YmapPlugin from 'vue-yandex-maps';
+Vue.use(YmapPlugin, {
+    apiKey: 'c1ebd1aa-95d9-4731-bfdc-69025a81c336',
+    lang: 'ru_RU',
+    coordorder: 'latlong',
+    version: '2.1',
+});
+
 Vue.config.productionTip = false;
 
 window.onlineAppointmentInstance = new Vue({

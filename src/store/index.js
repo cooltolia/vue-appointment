@@ -170,7 +170,7 @@ export default new Vuex.Store({
                 grecaptcha.ready(function() {
                     grecaptcha
                         .execute('6LdDp8gaAAAAAGwy86x68-rkIgkHVfLQcK1_Xy1x', {
-                            action: 'calculation',
+                            action: 'appointment',
                         })
                         .then(function(token) {
                             resolve(token);
@@ -270,7 +270,10 @@ export default new Vuex.Store({
 
             return new Promise((resolve) => {
                 http.post('/order/branches.php', postData).then((response) => {
-                    commit('updateBranchesList', response.data.branches);
+                    commit(
+                        'updateBranchesList',
+                        response.data.branches
+                    );
                     resolve(response.data.branches);
                 });
             });

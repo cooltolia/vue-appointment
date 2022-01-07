@@ -43,7 +43,7 @@
                             :placeholder="'Выберите направление'"
                             :name="'appointment_specialization'"
                             :selected='selectedSpecializationName'
-                            :options="{onSelect: onSpecializationSelect}"
+                            :settings="{onSelect: onSpecializationSelect}"
                             :disabled="specializations.length === 0"
                             :key='selectedSpecializationName'
                         ></custom-select>
@@ -60,7 +60,7 @@
                             :placeholder="'Выберите услугу'"
                             :name="'appointment_services'"
                             :selected='selectedServiceName'
-                            :options="{onSelect: onServiceSelect}"
+                            :settings="{onSelect: onServiceSelect}"
                             :disabled="services.length === 0 || !selectedSpecializationName"
                         ></custom-select>
                     </div>
@@ -70,12 +70,21 @@
                     >
                         <custom-select
                             ref="branchesSelect"
+                            :key="branchesListId"
                             :items="branches"
                             :placeholder="'Выберите филиал'"
                             :name="'appointment_branches'"
-                            :options="{multiple: true, multipleCounterLabel: 'Выбрано филиалов', onSelect: onBranchSelect}"
+                            :settings="{multiple: true, multipleCounterLabel: 'Выбрано филиалов', onSelect: onBranchSelect}"
                             :disabled="disableBranchesSelect"
-                        ></custom-select>
+                        >
+                            <template v-slot:before-dropdown>
+                                <button
+                                    type="button"
+                                    class="branches-map-trigger"
+                                    @click="openBranchesMap"
+                                >Выбрать на карте</button>
+                            </template>
+                        </custom-select>
                     </div>
                 </template>
             </div>
@@ -115,7 +124,6 @@
                         v-if='noSubmitButton'
                     >Заказать звонок коллцентра</button>
                 </template>
-
             </div>
         </div>
 
@@ -126,6 +134,7 @@
 <script>
     import CustomSelect from '@/components/CustomSelect.vue';
     import CallbackModal from '@/components/CallbackModal.vue';
+    import BranchesMapModal from '@/components/BranchesMapModal.vue';
 
     import { mapActions, mapMutations } from 'vuex';
 
@@ -137,6 +146,7 @@
         data() {
             return {
                 selectedBranches: {},
+                branchesListId: 1,
                 loader: false,
                 loaderTextArray: [
                     { text: 'Ищем подходящие приемы', delay: 5000 },
@@ -155,9 +165,10 @@
                     Object.keys(this.selectedBranches).length > 0
                 ) {
                     return true;
-                } else {
-                    return false;
                 }
+
+                return false;
+
                 return (
                     (!!this.selectedSpecializationName || !!this.selectedServiceName) &&
                     !!Object.keys(this.selectedBranches).length > 0
@@ -195,6 +206,59 @@
             },
         },
         methods: {
+            rerenderBranchesList(ids, booleanToSet) {
+                this.branchesListId = new Date().toString();
+                this.updateBranchesList(
+                    this.branches.map((el) => {
+                        if (ids.includes(el.id)) {
+                            if (booleanToSet) {
+                                el.selected = booleanToSet;
+                            } else {
+                                el.selected = !el.selected;
+                            }
+
+                            if (el.selected) {
+                                this.$set(this.selectedBranches, el.id, { value: el.name, id: el.id });
+                            } else {
+                                this.$delete(this.selectedBranches, el.id);
+                            }
+                        }
+                        return el;
+                    })
+                );
+                this.updateSelectedBranches(this.selectedBranches);
+            },
+            openBranchesMap() {
+                const vm = this;
+
+                this.$modal.show(
+                    BranchesMapModal,
+                    {
+                        selected: (pointId) => {
+                            vm.rerenderBranchesList([pointId]);
+                        },
+                        branches: this.branches,
+                    },
+                    {
+                        adaptive: true,
+                        width: '90%',
+                        maxWidth: 686,
+                        height: 'auto',
+                        scrollable: true,
+                        minHeight: Infinity,
+                    },
+                    {
+                        'before-open': (event) => {
+                            document.body.style.overflow = 'hidden';
+                            document.body.style.paddingRight = vm.$store.state.scrollbarWidth + 'px';
+                        },
+                        closed: (event) => {
+                            document.body.style.overflow = null;
+                            document.body.style.paddingRight = null;
+                        },
+                    }
+                );
+            },
             ...mapMutations([
                 'updateSelectedSpecialization',
                 'updateSelectedBranches',
@@ -254,10 +318,23 @@
                         this.branches.map((el) => {
                             this.$set(this.selectedBranches, el.id, { value: el.name, id: el.id });
                         });
+
+                        this.updateBranchesList(
+                            this.branches.map((el) => {
+                                el.selected = true;
+                                return el;
+                            })
+                        );
                     } else {
                         this.branches.map((el) => {
                             this.selectedBranches = {};
                         });
+                        this.updateBranchesList(
+                            this.branches.map((el) => {
+                                el.selected = false;
+                                return el;
+                            })
+                        );
                     }
                 } else {
                     if (selectedValue.action === 'add') {
@@ -265,6 +342,15 @@
                     } else {
                         this.$delete(this.selectedBranches, selectedValue.id);
                     }
+
+                    this.updateBranchesList(
+                        this.branches.map((el) => {
+                            if (el.id === selectedValue.id) {
+                                el.selected = !el.selected;
+                            }
+                            return el;
+                        })
+                    );
                 }
 
                 this.updateSelectedBranches(this.selectedBranches);
@@ -383,7 +469,6 @@
                 }
             });
         },
-
         destroyed() {
             this.$root.$off('typeUpdate');
         },
@@ -483,6 +568,13 @@
             width: 30%;
             flex: 1 1 auto;
             margin: 0 8px;
+        }
+
+        .branches-map-trigger {
+            @include btn-reset;
+
+            padding: 20px 30px 0;
+            text-decoration: underline;
         }
 
         .input input {
