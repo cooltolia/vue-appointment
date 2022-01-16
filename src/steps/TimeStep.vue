@@ -83,29 +83,23 @@
                 </div>
             </keep-alive>
             <transition name='fade'>
-                <div class="doctors">
-                    <simplebar
-                        data-simplebar-auto-hide="false"
-                        class="list"
-                        ref='doctorsList'
+                <div class="doctors list">
+                    <div
+                        class='card'
+                        v-for='(card, i) in optionsList'
+                        :key='i'
                     >
-                        <div
-                            class='card'
-                            v-for='(card, i) in optionsList'
-                            :key='i'
-                        >
-                            <DoctorCard
-                                :key='card.doctor.id'
-                                :doctorId='card.doctor.id'
-                                :shiftId='card.doctor.id_shift'
-                                :branchId='card.branch.id'
-                                :doctorData="{avatar: card.doctor.photo, name: card.doctor.name, profession: card.doctor.position, experience: card.doctor.experience, feature: card.doctor.feature}"
-                                :address='card.branch.name'
-                                :metro='card.branch.address'
-                                :workTime='card.slots'
-                            ></DoctorCard>
-                        </div>
-                    </simplebar>
+                        <DoctorCard
+                            :key='card.doctor.id'
+                            :doctorId='card.doctor.id'
+                            :shiftId='card.doctor.id_shift'
+                            :branchId='card.branch.id'
+                            :doctorData="{avatar: card.doctor.photo, name: card.doctor.name, profession: card.doctor.position, experience: card.doctor.experience, feature: card.doctor.feature}"
+                            :address='card.branch.name'
+                            :metro='card.branch.address'
+                            :workTime='card.slots'
+                        ></DoctorCard>
+                    </div>
                 </div>
             </transition>
         </div>
@@ -133,8 +127,6 @@
                 selectedService: null,
                 selectedBranches: null,
 
-                scroll: null,
-
                 optionsList: [],
 
                 selectedDate: null,
@@ -151,9 +143,6 @@
             selectedDate(newValue, oldValue) {
                 const newDate = newValue.getTime() / 1000;
                 this.updateSelectedDate({ value: newValue, id: newDate });
-                // if (oldValue) this.optionsList = [];
-
-                this.$refs.doctorsList.SimpleBar.getScrollElement().scrollTop = 0;
 
                 this.optionsList = this.$store.state.allTimeSlotsData.schedule[newDate].items;
             },
@@ -231,7 +220,6 @@
 
             setTimeout(() => {
                 this.calendarComponent = 'v-date-picker';
-                // this.scroll = new SimpleBar(this.$refs.doctorsList);
             }, 0);
 
             this.$root.$on('typeUpdate', (e) => {
@@ -257,6 +245,9 @@
 <style lang='scss' scoped>
     .time-step {
         /deep/ .vc-container {
+            position: sticky;
+            top: 100px;
+
             --header-padding: 20px 20px 0 20px;
             --weeks-padding: 16px 20px;
             --day-content-width: 42px;
@@ -431,7 +422,6 @@
         }
 
         .calendar {
-            width: 376px;
             min-height: 452px;
             flex: 0 0 auto;
         }
@@ -440,33 +430,21 @@
             position: relative;
             width: 50%;
             flex: 1 1 auto;
-
-            .list {
-                position: absolute;
-                top: 0;
-                left: 0;
-                padding-left: 40px;
-                padding-right: 40px;
-                width: calc(100% + 40px);
-                height: calc(100% + 40px);
-
-                /deep/ .simplebar-track.simplebar-vertical {
-                    right: 16px;
-                }
-            }
+            padding-left: 40px;
 
             .card {
                 margin-bottom: 24px;
 
                 &:last-child {
-                    margin-bottom: 40px;
+                    // margin-bottom: 40px;
+                    margin-bottom: 0;
                 }
             }
         }
 
         @media (max-width: 768px) {
             .calendar {
-                width: 276px;
+                // width: 276px;
                 min-height: 348px;
             }
 
@@ -477,7 +455,7 @@
             .doctors {
                 margin-top: 24px;
                 width: 100%;
-                height: 400px;
+                padding-left: 0;
 
                 .list {
                     width: 100%;
@@ -502,6 +480,9 @@
                 --highlight-height: 34px;
 
                 --day-content-bg-color-hover: rgba(130, 191, 49, 0.3);
+
+                position: static;
+                width: 100%;
 
                 .vc-title {
                     font-size: 16px;
@@ -541,18 +522,6 @@
             .doctors {
                 margin-top: 24px;
                 width: 100%;
-                height: 400px;
-
-                .list {
-                    width: 100%;
-                    height: 100%;
-                    padding: 0;
-
-                    /deep/ .simplebar-track.simplebar-vertical {
-                        right: -12px;
-                        bottom: 40px;
-                    }
-                }
             }
         }
     }

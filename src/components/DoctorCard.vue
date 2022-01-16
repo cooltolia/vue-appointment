@@ -128,6 +128,7 @@
                     });
                     this.updateSelectedBranch({ value: this.address, id: this.branchId });
                     this.changeCurrentStep('formStep');
+                    this.$scrollTo('#onlineAppointment', 300);
                 }
             },
         },

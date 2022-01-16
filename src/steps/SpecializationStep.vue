@@ -207,7 +207,6 @@
         },
         methods: {
             rerenderBranchesList(ids, booleanToSet) {
-                this.branchesListId = new Date().toString();
                 this.updateBranchesList(
                     this.branches.map((el) => {
                         if (ids.includes(el.id)) {
@@ -242,7 +241,7 @@
                     {
                         adaptive: true,
                         width: '90%',
-                        maxWidth: 686,
+                        maxWidth: 1024,
                         height: 'auto',
                         scrollable: true,
                         minHeight: Infinity,
@@ -251,6 +250,9 @@
                         'before-open': (event) => {
                             document.body.style.overflow = 'hidden';
                             document.body.style.paddingRight = vm.$store.state.scrollbarWidth + 'px';
+                        },
+                        'before-close': () => {
+                            vm.branchesListId = new Date().toString();
                         },
                         closed: (event) => {
                             document.body.style.overflow = null;
@@ -447,6 +449,13 @@
             // this.updateBranchesList([]);
             this.selectedBranches = {};
             this.updateSelectedBranches(null);
+            this.branchesListId = new Date().toString();
+            this.updateBranchesList(
+                this.branches.map((el) => {
+                    el.selected = false;
+                    return el;
+                })
+            );
 
             // if (!this.selectedService && this.$store.state.currentStep === 'specializationStep') {
             //     console.log('ooops');debugger;
