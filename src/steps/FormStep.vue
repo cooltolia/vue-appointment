@@ -48,20 +48,44 @@
                         <div class="custom-input">
                             <input
                                 class='custom-input__input'
+                                type="text"
+                                v-model="lastName"
+                                placeholder="Фамилия"
+                            >
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="custom-input">
+                            <input
+                                class='custom-input__input'
+                                type="text"
+                                v-model="firstName"
+                                placeholder="Имя"
+                            >
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="custom-input">
+                            <input
+                                class='custom-input__input'
+                                type="text"
+                                v-model="patronym"
+                                placeholder="Отчество"
+                            >
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="custom-input">
+                            <input
+                                class='custom-input__input'
                                 v-mask="'+7 (999) 999-99-99'"
                                 inputmode="tel"
                                 placeholder="Телефон"
                                 v-model="phone"
                                 @input="phoneValidate"
                             />
-                        </div>
-                        <div class="custom-input">
-                            <input
-                                class='custom-input__input'
-                                type="text"
-                                v-model="name"
-                                placeholder="ФИО"
-                            >
                         </div>
                         <div class='input'>
                             <input
@@ -74,12 +98,12 @@
                             />
                         </div>
                     </div>
-                    <div class="form-col">
+                    <div class="form-col x2">
                         <div class="custom-textarea">
                             <textarea
                                 class="custom-textarea__input"
                                 v-model="comment"
-                                placeholder="Комментарий"
+                                placeholder="По какому поводу Вы записываетесь на услугу"
                             ></textarea>
                         </div>
 
@@ -128,7 +152,9 @@
 
                 birthday: '',
                 phone: '',
-                name: '',
+                firstName: '',
+                lastName: '',
+                patronym: '',
                 comment: '',
 
                 birthdayValid: false,
@@ -192,7 +218,9 @@
                 const data = {
                     birthday: this.birthday,
                     phone: this.phone,
-                    name: this.name,
+                    first_name: this.firstName,
+                    last_name: this.lastName,
+                    patronym: this.patronym,
                     comment: this.comment,
                     doctor: this.selectedDoctor.id,
                     shift: this.selectedDoctor.shift,
@@ -243,7 +271,6 @@
                                         },
                                     }
                                 );
-
                             } else if (response.data.error === 'error_order') {
                                 this.$modal.show(
                                     NotifyModal,
@@ -282,7 +309,14 @@
         },
         computed: {
             formValid() {
-                return this.birthdayValid && this.phoneValid && this.name.trim().length >= 2;
+                return (
+                    this.birthdayValid &&
+                    this.phoneValid &&
+                    this.firstName.trim().length >= 2 &&
+                    this.lastName.trim().length >= 2 &&
+                    this.patronym.trim().length >= 2 &&
+                    this.comment.trim().length > 0
+                );
             },
         },
         mounted() {
@@ -380,7 +414,8 @@
 
     .form-row {
         display: flex;
-        margin-bottom: 24px;
+        width: calc(100% + 16px);
+        margin: 0 -8px 24px;
 
         &:last-child {
             margin-bottom: 0;
@@ -390,10 +425,10 @@
     .form-col {
         flex: 1 1 auto;
         width: 20%;
+        margin: 0 8px;
 
-        &:last-child {
+        &.x2 {
             flex: 2 1 auto;
-            margin-left: 16px;
 
             .input {
                 height: 100%;
@@ -500,6 +535,7 @@
 
         .form-row {
             display: block;
+            width: 100%;
             margin: 0 0 16px;
         }
 
