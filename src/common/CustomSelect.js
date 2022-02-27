@@ -20,7 +20,6 @@ export default class CustomSelect {
     }
 
     setup() {
-        console.log('setup');
         this.valueInput = this.select.querySelector('.custom-select__value');
         this.selected = this.select.querySelector('.custom-select__selected');
         this.dropdown = this.select.querySelector('.custom-select__dropdown');
@@ -246,7 +245,6 @@ export default class CustomSelect {
 
     multipleSelectLogic(e, selectedValue) {
         const valueDivider = ';';
-        console.log(e, selectedValue);
         const target = e.target;
         const action = target.classList.contains('selected') ? 'remove' : 'add';
         const toggleAll = target.dataset.all !== undefined;

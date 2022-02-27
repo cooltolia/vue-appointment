@@ -1,4 +1,4 @@
-export {postData, getData, test}
+export {postData, getData}
 
 function postData(url, options) {
     const requestOptions = {
@@ -14,10 +14,6 @@ function postData(url, options) {
         //     window.location.reload()
         // }
     });
-}
-
-function test() {
-    console.log('test is invoked');
 }
 
 function getData(url, options) {

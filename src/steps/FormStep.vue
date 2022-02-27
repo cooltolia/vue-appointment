@@ -35,6 +35,10 @@
                     >Сменить
                     </a>
                 </div>
+                <div class='info-row' v-if="selectedDoctor.feature">
+                    <div class="info-title">Особенности приема врача:</div>
+                    <div class="info-value">{{ selectedDoctor.feature }}</div>
+                </div>
             </div>
             <div class="form-title">
                 Заполните данные пациента:
@@ -103,7 +107,7 @@
                             <textarea
                                 class="custom-textarea__input"
                                 v-model="comment"
-                                placeholder="По какому поводу Вы записываетесь на услугу"
+                                placeholder="Комментарий"
                             ></textarea>
                         </div>
 
@@ -314,8 +318,7 @@
                     this.phoneValid &&
                     this.firstName.trim().length >= 2 &&
                     this.lastName.trim().length >= 2 &&
-                    this.patronym.trim().length >= 2 &&
-                    this.comment.trim().length > 0
+                    this.patronym.trim().length >= 2
                 );
             },
         },

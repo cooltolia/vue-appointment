@@ -132,7 +132,6 @@
                     page_url: window.location.href,
                     page_title: document.title,
                 };
-                console.log(this.specialization);
                 const formData = new FormData();
 
                 for (let key in data) {

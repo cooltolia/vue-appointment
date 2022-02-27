@@ -119,10 +119,9 @@
             timeSelect(e, time) {
                 if (e.target.tagName.toLowerCase() === 'button') {
                     e.target.classList.add('selected');
-                    console.log(time.id_shift);
                     this.updateSelectedTime(e.target.textContent.trim());
                     this.updateSelectedDoctor({
-                        name: this.doctorData.name,
+                        ...this.doctorData,
                         id: this.doctorId,
                         shift: time.id_shift,
                     });

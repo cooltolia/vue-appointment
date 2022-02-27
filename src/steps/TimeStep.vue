@@ -161,7 +161,6 @@
 
             returnBack(step, type = '') {
                 this.changeCurrentStep(step);
-                console.log('change step');
                 if (step === 'nameStep') {
                     this.updateSelectedDoctor(null);
                 }
@@ -223,7 +222,6 @@
             }, 0);
 
             this.$root.$on('typeUpdate', (e) => {
-                // console.log('clear all');
                 this.selectedBranches = {};
                 this.updateSelectedBranches(null);
                 this.updateSelectedSpecialization(null);

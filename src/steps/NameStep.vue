@@ -22,7 +22,7 @@
                 <span
                     class="input-error"
                     v-if="empty"
-                >Врачи на найдены</span>
+                >Врачи не найдены</span>
                 <input
                     type="text"
                     name="doctor"
@@ -210,7 +210,6 @@
             updateLoaderText(array = null) {
                 array = array || [...this.loaderTextArray];
                 const item = array.shift();
-                console.log(item);
 
                 if (!item) {
                     this.stopLoaderText();
@@ -249,7 +248,6 @@
         },
         mounted() {
             this.debouncedGetData = debounce(this.getData, 500);
-            console.log('mounted');
 
             this.updateSelectedSpecialization(null);
             this.updateSelectedBranches(null);
@@ -265,8 +263,6 @@
 
                 this.doctorName = '';
                 this.doctorID = null;
-
-                console.log('bvbb');
             });
 
             new SimpleBar(this.$refs.doctorsDropdown);

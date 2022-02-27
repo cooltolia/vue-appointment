@@ -86,7 +86,6 @@
         methods: {
             triggerCallback($event, specialization = null) {
                 const vm = this;
-                console.log(specialization);
 
                 this.$modal.show(
                     CallbackModal,

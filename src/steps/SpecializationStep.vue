@@ -198,7 +198,6 @@
                 return this.$store.state.selectedService;
             },
             selectedSpecializationName() {
-                console.log(this.$store.state.selectedSpecialization);
                 return this.$store.state.selectedSpecialization?.name;
             },
             selectedServiceName() {
@@ -359,7 +358,6 @@
             },
             triggerCallback($event, specialization = null) {
                 const vm = this;
-                console.log(specialization);
 
                 this.$modal.show(
                     CallbackModal,
@@ -392,7 +390,6 @@
                     service: this.selectedService ? this.selectedService.id : null,
                     branches: Object.keys(this.selectedBranches),
                 };
-                console.log(formData);
 
                 this.loader = true;
                 this.updateLoaderText();
@@ -414,7 +411,6 @@
             updateLoaderText(array = null) {
                 array = array || [...this.loaderTextArray];
                 const item = array.shift();
-                console.log(item);
 
                 if (!item) {
                     this.stopLoaderText();
@@ -457,22 +453,11 @@
                 })
             );
 
-            // if (!this.selectedService && this.$store.state.currentStep === 'specializationStep') {
-            //     console.log('ooops');debugger;
-            //     console.log(this.$store.state.currentSpecializationsType);
-            //     // this.loadSpecializationsList(this.$store.state.currentSpecializationsType);
-            // }
-
             this.$root.$on('typeUpdate', (e) => {
-                // console.log('clear all');
                 this.selectedBranches = {};
-                // this.updateSelectedBranches(null);
                 this.updateSelectedBranches(null);
                 this.updateSelectedSpecialization(null);
                 this.updateSelectedService(null);
-                // this.updateSelectedService(null);
-                // this.updateServicesList([])
-                // window.specialization = null;
                 if (!this.selectedService && this.$store.state.currentStep === 'specializationStep') {
                     this.loadSpecializationsList(this.$store.state.currentSpecializationsType);
                 }

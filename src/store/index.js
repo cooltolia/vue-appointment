@@ -210,7 +210,6 @@ export default new Vuex.Store({
                         dispatch('loadBranchesList', { service: response.data.service });
                     } else if (response.data.doctor) {
                         state.currentStep = 'nameStep';
-                        console.log('set');
                         commit('updateSelectedDoctor', response.data.doctor);
                     } else {
                         if (response.data.specialization) {

@@ -49,7 +49,6 @@ export const throttle = function(func, wait, options) {
 export const measureScrollbar = function(force = false) {
     // return cached value if we have some
     if (force !== true && typeof measureScrollbar.__cache === 'number') {
-        console.log('returned from cache');
         return measureScrollbar.__cache;
     }
 

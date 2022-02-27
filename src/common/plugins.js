@@ -203,7 +203,6 @@ const $$ = {
 
     scrollTo(target, offset = 50) {
         if (!target) {
-            console.log('target: ', target);
             return;
         }
         const scrollPosition = target.getBoundingClientRect().top + window.scrollY;
