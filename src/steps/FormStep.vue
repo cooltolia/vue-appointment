@@ -244,6 +244,7 @@
 
                 this.fireCaptcha().then((token) => {
                     formData.append('recaptcha', token);
+                    formData.append('page_url', window.location.href);
 
                     http.post('/order/add.php', formData, { cache: false })
                         .then((response) => {
